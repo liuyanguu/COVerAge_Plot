@@ -1,4 +1,4 @@
-- [Country-specific plot](##Country-specific%20plot)
+- [Country-specific plot](https://github.com/liuyanguu/COVerAge_Plot/blob/master/README.md#country-specific-plot)
 - [Aggregated plots for all countries](##Aggregated%20plots%20for%20all%20countries )
 - [All together](##All%20together)
 
