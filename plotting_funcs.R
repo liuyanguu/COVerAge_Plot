@@ -24,7 +24,7 @@ get_MPIDR_output_10 <- function(){
 
 refresh_data <- function(save_locally = TRUE){
   # refresh raw dataset
-  message("Hold on, this is going to take a while ... ")
+  message("Hold on, the file is over 130MB. This is going to take a while ... ")
   # download the online data
   dt0 <- get_MPIDR_inputDB()
   dt0$Download_Date <- format(Sys.Date(), "%d-%m-%Y")
@@ -87,7 +87,9 @@ get_cnames <- function(dt1){
 # 3. Core plotting funcs. ------------------------------------------------------
 #' Core plot function to make one plot
 #' reorder age intervals in the right way
+#' NA age group will be coded into "Unknown"
 plot.measure <- function(data, Measure0){
+  
   data_sex <- copy(data[Measure==Measure0])
   levels0 <- unique(sort(data_sex$Age))
   n_levels <- length(levels0)
@@ -170,12 +172,12 @@ plot.measure <- function(data, Measure0){
 } 
 
 # Calculate CFR --- Case Fatality Rate ---- 
-get.data.CFR <- function(data_total, Exact_Match = FALSE){
-  # when it is possible to calculate CFR:
-  avail_mea <- sort(unique(data_total[Value!=0, Measure]))
+get.data.CFR <- function(data_both, Exact_Match = FALSE){
+  # check if it is possible to calculate CFR:
+  avail_mea <- sort(unique(data_both[Value!=0, Measure]))
   if(!("Cases"%in%avail_mea & "Deaths"%in%avail_mea)) return(NULL)
-  data_both <- copy(data_total)
-  data_both <- data_both[Age!="Unknown"]
+  # no CFR for the Unknown
+  data_both <- copy(data_both)[Age!="Unknown"]
   n_sex <- uniqueN(data_both$Sex)
   if(!n_sex%in%c(1L,2L,3L)) stop("Check sex in CFR")
   # Diff age interval 
@@ -185,11 +187,11 @@ get.data.CFR <- function(data_total, Exact_Match = FALSE){
     data_both_w <- dcast(data_both, Age ~ Measure, value.var = "Value")
     data_both_w[, `:=`(Sex = "Both", Measure = "CFR")] # add marker
   }  else {
-    # BOth have F/M, Keep Sex
+    # Both have F/M, Keep Sex
     data_both_w <- dcast(data_both, Age + Sex ~ Measure, value.var = "Value")
     data_both_w[, `:=`(Measure = "CFR")] # add marker
   }
-  # check basic if Case > Death
+  # check if Case > Death
   if(nrow(data_both_w[Deaths > Cases])>0) return(NULL)
   
   # Aggregate by common age group
@@ -198,7 +200,8 @@ get.data.CFR <- function(data_total, Exact_Match = FALSE){
   if(Exact_Match){
     if (any(is.na(data_both_w$Common_Age))) return(NULL)
   }
-  data_both_w$Common_Age <- zoo::na.locf(data_both_w$Common_Age) # rolling forward
+  # rolling forward to fill in all the gaps in age intervals for aggregating
+  data_both_w$Common_Age <- zoo::na.locf(data_both_w$Common_Age) 
   data_both_w[, Cases:= sum(Cases, na.rm = TRUE), by = .(Sex, Common_Age)]
   data_both_w[, Deaths:= sum(Deaths, na.rm = TRUE), by = .(Sex, Common_Age)]
   data_both_w <- data_both_w[!is.na(Common_Age)]
@@ -324,12 +327,12 @@ save_country_plot_in_one <- function(
 # 4.2 Aggregated plot -----------------------------------------------------
 
 
-#' get dt by country for total plot
+#' get data by country for the total plot
 #'
 #' @param cname0 one country name
 #' @param target_interval target interval to plot
 #' @param get_f_m  # If TRUE, only use those with sex-specific data and make sex-specific plot; If FALSE, make plot for Both sex
-get.dt.by.measure <- function(
+get_dt_for_total <- function(
   data,
   cname0, 
   target_interval = seq(0, 60, by = 10),
@@ -337,7 +340,7 @@ get.dt.by.measure <- function(
 ){
   data_measure <- data[Age!="TOT" & Country==cname0]
   avail_mea <- sort(unique(data_measure[Value!=0, Measure]))
-  # must have both to get CFR
+  # must have both Cases and Deaths to get CFR
   if(!("Cases"%in%avail_mea & "Deaths"%in%avail_mea)) return(NULL)
   
   get.sex <- function(Measure0){
@@ -352,11 +355,12 @@ get.dt.by.measure <- function(
   }
   # if to get sex-specific, Must both have Female and Male 
   if(get_f_m){
+    # force both F&M exist in the dataset for both measures
     data_sex <- data_measure[Sex%in%c("Female", "Male")]
     avail_mea <- unique(data_sex[Value!=0, Measure])
     if(!all(c("Cases", "Deaths")%in%avail_mea)) return(NULL)
   } else {
-    # use both if both available
+    # Use Both if Both is available and if there is F&M, later F&M will be combined into Both
     data_sex <- rbindlist(lapply(c("Cases", "Deaths"), get.sex))
   }
   
@@ -381,16 +385,16 @@ get.dt.by.measure <- function(
     data_sex2 <- unique(data_sex2[,.(Measure, Age, Value)])
     data_sex2[, Sex:= "Both"]
   }
-  data_sex2 <- data_sex2[!is.na(Age)]
+  # data_sex2 <- data_sex2[!is.na(Age)]
   data_sex2[, Country:= cname0]
   # 
   return(data_sex2)
 }
 
 # revise the total dataset 
-revise.data.total <- function(data){
-  n_country <- uniqueN(data$Country)
-  data_total <- copy(data[Age!="Unknown"])
+revise.data.total <- function(data_total){
+  n_country <- uniqueN(data_total$Country)
+  # data_total <- copy(data[Age!="Unknown"])
   data_total[, Value:= sum(Value), by = .(Measure, Sex, Age)]
   data_total <- unique(data_total[,.(Measure, Sex, Age, Value)])
   data_CFR <- get.data.CFR(data_total)
@@ -425,10 +429,10 @@ plot_aggregated_total_wrap <- function(
 ){
   # target_interval = seq(0, 60, by = 10)
   cnames <- unique(data$Country)
-  data_total1 <- rbindlist(lapply(cnames, get.dt.by.measure, data = data, 
+  data_total1 <- rbindlist(lapply(cnames, get_dt_for_total, data = data, 
                                   target_interval = seq(0, max_interval, by = by_interval),
                                   get_f_m = FALSE))
-  data_total2 <- rbindlist(lapply(cnames, get.dt.by.measure, data = data, 
+  data_total2 <- rbindlist(lapply(cnames, get_dt_for_total, data = data, 
                                   target_interval = seq(0, max_interval, by = by_interval),
                                   get_f_m = TRUE))
   g_list <- lapply(list(data_total1, data_total2), plot_aggregated_total)
@@ -437,7 +441,7 @@ plot_aggregated_total_wrap <- function(
   # height = 4 for each row 
   if(!dir.exists(folder)) dir.create(folder, recursive = TRUE)
   ggsave(filename = file.path(folder, 
-                              paste0("Aggregated_plot_0to", max_interval, "_by", by_interval,".png")),
+                              paste0("Aggregated_plot_0to", max_interval, "_by", by_interval,"_", n_col0, "rows", ".png")),
         g_grid, 
          # save each 3-panel plot as 11*4
          width = 11*n_col0, 

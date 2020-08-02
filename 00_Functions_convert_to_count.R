@@ -2,7 +2,7 @@
 # https://github.com/timriffe/covid_age/tree/master/R
 
 convert_to_count <- function(inputDB){
-  require(dplyr)
+  require(dplyr, quietly = TRUE)
   inputDB %>% 
     filter(!(Age == "TOT" & Metric == "Fraction"),
            !(Age == "UNK" & Value == 0),
