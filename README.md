@@ -1,9 +1,12 @@
-# COVerAge_Plot : Age Pyramid for the COVerAGE-DB Dataset
+- [Country-specific plot](##Country-specific%20plot)
+- [Aggregated plots for all countries](##Aggregated%20plots%20for%20all%20countries )
+- [All together](##All%20together)
 
+# COVerAge_Plot : Age Pyramid for the COVerAGE-DB Dataset
 COVerAGE-DB dataset: [https://github.com/timriffe/covid_age](https://github.com/timriffe/covid_age)
 
 The `main_script.R` walks through the process to make all the plots below
-
+<!-- toc -->
 ## Download raw data from OSF: https://osf.io/mpwjq/
 ```{r}
 source("plotting_funcs.R") # all the plotting functions
@@ -14,6 +17,7 @@ inputDB <- refresh_data(save_locally = TRUE) # download and save the data locall
 ## Country-specific plot 
 * Three-plots age pyramid for each country showing Cases, Deaths, and CFR (Death/Case), whichever is available
 * Showing sex-specific if available
+* Showing in title the latest date used as it is different for each country
 ```{r}
 dt1 <- clean_inputDB(inputDB = inputDB)
 all_countries <- get_cnames(dt1)
