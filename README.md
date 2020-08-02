@@ -1,4 +1,4 @@
-# COVerAge_Plot : Age Pyramid for COVerAGE-DB Dataset
+# COVerAge_Plot : Age Pyramid for the COVerAGE-DB Dataset
 
 COVerAGE-DB dataset: [https://github.com/timriffe/covid_age](https://github.com/timriffe/covid_age)
 
@@ -6,9 +6,9 @@ The `main_script.R` walks through the process to make all the plots below
 
 ## Download raw data from OSF: https://osf.io/mpwjq/
 ```{r}
-source("plotting_funcs.R")
-source("00_Functions_convert_to_count.R")
-inputDB <- refresh_data(save_locally = TRUE) # re-download and calculate fraction into numbers (takes a while)
+source("plotting_funcs.R") # all the plotting functions
+source("00_Functions_convert_to_count.R") # borrow to distribute total if Metric is "Fraction"
+inputDB <- refresh_data(save_locally = TRUE) # download and save the data locally
 ```
 
 ## Country-specific plot 
@@ -55,5 +55,10 @@ g_total <- Map(plot_aggregated_total_wrap,
 ![Aggregated_plot_0to60_by10_1rows](https://user-images.githubusercontent.com/11966330/89129397-345a3c80-d4cb-11ea-81bf-59d6a16f8b0e.png)
 
 ## All together (aggregated + country-specific)
+Code in `main_script.R`
+
+### Aggregated results using different combinations  
 ![MPIDR_aggregated](https://user-images.githubusercontent.com/11966330/89129409-42a85880-d4cb-11ea-8ffe-133faf1c88d7.png)
+
+### Every country in the dataset  
 ![MPIDR_Countries_wCFR](https://user-images.githubusercontent.com/11966330/89129411-450ab280-d4cb-11ea-850a-ccfd50f1bdcb.png)

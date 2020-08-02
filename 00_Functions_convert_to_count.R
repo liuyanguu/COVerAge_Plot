@@ -1,6 +1,7 @@
 # borrowed step 1 from covid_age/R/00_Functions.R
 # https://github.com/timriffe/covid_age/tree/master/R
-
+# https://timriffe.github.io/covid_age/DataSteps.html
+# If Metric is "Fraction", distribute totals to produce counts by age and/or sex
 convert_to_count <- function(inputDB){
   require(dplyr, quietly = TRUE)
   inputDB %>% 
