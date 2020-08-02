@@ -1,12 +1,12 @@
-- [Country-specific plot](https://github.com/liuyanguu/COVerAge_Plot/blob/master/README.md#country-specific-plot)
-- [Aggregated plots for all countries](##Aggregated%20plots%20for%20all%20countries )
-- [All together](##All%20together)
-
 # COVerAge_Plot : Age Pyramid for the COVerAGE-DB Dataset
 COVerAGE-DB dataset: [https://github.com/timriffe/covid_age](https://github.com/timriffe/covid_age)
 
+- [Country-specific plot](https://github.com/liuyanguu/COVerAge_Plot/blob/master/README.md#country-specific-plot)
+- [Aggregated plots for all countries](https://github.com/liuyanguu/COVerAge_Plot/blob/master/README.md#aggregated-plots-for-all-countries)
+- [All the plots](https://github.com/liuyanguu/COVerAge_Plot/blob/master/README.md#all-together-aggregated--country-specific)
+
 The `main_script.R` walks through the process to make all the plots below
-<!-- toc -->
+
 ## Download raw data from OSF: https://osf.io/mpwjq/
 ```{r}
 source("plotting_funcs.R") # all the plotting functions
