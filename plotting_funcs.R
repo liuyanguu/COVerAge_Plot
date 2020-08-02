@@ -23,7 +23,7 @@ get_MPIDR_output_10 <- function(){
 }
 
 refresh_data <- function(save_locally = TRUE){
-  # refresh raw dataset
+  # refresh raw dataset from OSF: https://osf.io/mpwjq/
   message("Hold on, the file is over 130MB. This is going to take a while ... ")
   # download the online data
   dt0 <- get_MPIDR_inputDB()
