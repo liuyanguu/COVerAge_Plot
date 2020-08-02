@@ -4,9 +4,9 @@
 source("plotting_funcs.R")
 source("00_Functions_convert_to_count.R")
 # recommend to save it locally after downloading and processing (set `save_locally` TRUE will create a "data/" folder locally)
-# inputDB <- refresh_data(save_locally = TRUE) # re-download and calculate fraction into numbers (takes a while)
+inputDB <- refresh_data(save_locally = TRUE) # re-download and calculate fraction into numbers (takes a while)
 # or, the dataset should be saved locally in the last step as it takes a while to download and process
-inputDB <- fread("data/MPIDR.input.csv") # for testing purpose 
+# inputDB <- fread("data/MPIDR.input.csv") # for testing purpose 
 inputDB[, table(Metric)]
 inputDB[, table(Measure)] # ASCFR  Cases Deaths  Tests
 dt1 <- clean_inputDB(inputDB = inputDB)
