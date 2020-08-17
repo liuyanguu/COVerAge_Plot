@@ -15,7 +15,7 @@ inputDB <- refresh_data(save_locally = TRUE) # download and save the data locall
 ```
 
 ## Country-specific plot 
-* Three-plots age pyramid for each country showing Cases, Deaths, and CFR (Death/Case), whichever is available
+* Age pyramid for each country showing Cases, Deaths, and CFR (Death/Case), whichever is available
 * Showing sex-specific if available
 * Showing in title the latest date used as it is different for each country
 ```{r}
@@ -28,11 +28,11 @@ p1 <- make_country_plot(cname0)
 
 
 ## Aggregated plots for all countries 
-* Only choose those that has both case and death data and can calculate CFR
+* Only choose those with both case and death data with matching age intervals, thus can calculate CFR
 * By assigning a common age interval, only those countries whose age interval are adaptable are used (i.e. through combining intervals into a wider one, 0-5 & 5-10 -> 0-10) 
-* Fewer countries will be included if set a stricter interval, or set `get_f_m = TRUE` to ask for sex-specific data
+* Fewer countries will be included if set a stricter/narrower interval, or set `get_f_m = TRUE` to ask for sex-specific data
 ```{r}
-# this example shows the countries available in 0 to 60 by 10 years age pyramid
+# this example shows the countries available with 0 to 60 by 10 years age intervals
 data_total1 <- rbindlist(lapply(all_countries, get_dt_for_total, 
                                 data = dt1,
                                 target_interval = seq(0, 60, by = 10),
@@ -41,7 +41,7 @@ data_total1 <- rbindlist(lapply(all_countries, get_dt_for_total,
 g1 <- plot_aggregated_total(data_total1)
 ```
 * A wrapped function to plot and save the aggregated plot:  
-Return list of figures, and save using ggsave in the same time   
+Return list of figures, and save output using ggsave in the same time   
 ```{r}
 g_list <- plot_aggregated_total_wrap(
   data = dt1, 
@@ -51,7 +51,6 @@ g_list <- plot_aggregated_total_wrap(
   folder = "fig/aggregated")
 
 # Make and save different combinations of desired intervals
-
 g_total <- Map(plot_aggregated_total_wrap, 
                max_interval = c(60, 60, 80, 80), by_interval = c(10, 20, 10, 20),
                one_row = FALSE)
@@ -59,7 +58,7 @@ g_total <- Map(plot_aggregated_total_wrap,
 ![Aggregated_plot_0to60_by10_1rows](https://user-images.githubusercontent.com/11966330/89129397-345a3c80-d4cb-11ea-81bf-59d6a16f8b0e.png)
 
 ## All together (aggregated + country-specific)
-Code in `main_script.R`
+Please refer to the code in `main_script.R`
 
 ### Aggregated results using different combinations  
 ![MPIDR_aggregated](https://user-images.githubusercontent.com/11966330/89129409-42a85880-d4cb-11ea-8ffe-133faf1c88d7.png)
