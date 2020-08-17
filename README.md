@@ -24,7 +24,7 @@ all_countries <- get_cnames(dt1)
 cname0 <- all_countries[1]
 p1 <- make_country_plot(cname0)
 ```
-![Afghanistan](https://user-images.githubusercontent.com/11966330/89129390-1d1b4f00-d4cb-11ea-8ee5-fcaded6596ef.png)
+![Afghanistan](fig/country/Afghanistan.png)
 
 
 ## Aggregated plots for all countries 
@@ -55,13 +55,13 @@ g_total <- Map(plot_aggregated_total_wrap,
                max_interval = c(60, 60, 80, 80), by_interval = c(10, 20, 10, 20),
                one_row = FALSE)
 ```
-![Aggregated_plot_0to60_by10_1rows](https://user-images.githubusercontent.com/11966330/89129397-345a3c80-d4cb-11ea-81bf-59d6a16f8b0e.png)
+![Aggregated_plot_0to60_by10_1rows](fig/aggregated/Aggregated_plot_0to60_by10_1rows.png)
 
 ## All together (aggregated + country-specific)
 Please refer to the code in `main_script.R`
 
 ### Aggregated results using different combinations  
-![MPIDR_aggregated](https://user-images.githubusercontent.com/11966330/89129409-42a85880-d4cb-11ea-8ffe-133faf1c88d7.png)
+![MPIDR_aggregated](fig/MPIDR_aggregated.png)
 
 ### Every country in the dataset  
-![MPIDR_Countries_wCFR](https://user-images.githubusercontent.com/11966330/89129411-450ab280-d4cb-11ea-850a-ccfd50f1bdcb.png)
+![MPIDR_Countries_wCFR](fig/MPIDR_Countries_wCFR.png)
