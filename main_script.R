@@ -54,6 +54,9 @@ g_list <- plot_aggregated_total_wrap(
 g_total <- Map(plot_aggregated_total_wrap, 
                max_interval = c(60, 60, 80, 80), by_interval = c(10, 20, 10, 20),
                one_row = FALSE)
+g_total <- Map(plot_aggregated_total_wrap, 
+               max_interval = c(60, 60, 80, 80), by_interval = c(10, 20, 10, 20),
+               one_row = TRUE)
 
 # all the aggregated plots together
 g_grid1 <- cowplot::plot_grid(plotlist = g_total, ncol = 1)
@@ -64,3 +67,4 @@ Reference <- cowplot::ggdraw() +
 g_grid_wref <- cowplot::plot_grid(g_grid1, Reference, ncol = 1,
                                   rel_heights = c(1, 0.05))
 ggsave(paste0("fig/MPIDR_aggregated",".png"), g_grid_wref, width = 24, height = 4*length(g_total), limitsize = FALSE)
+ggsave(paste0("fig/MPIDR_aggregated",".pdf"), g_grid_wref, width = 24, height = 4*length(g_total), limitsize = FALSE)
