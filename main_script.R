@@ -5,7 +5,7 @@ source("plotting_funcs.R")
 source("00_Functions_convert_to_count.R")
 # recommend to save it locally after downloading and processing (set `save_locally` TRUE will create a "data/" folder locally)
 inputDB <- refresh_data(save_locally = TRUE) # re-download and calculate fraction into numbers (takes a while)
-# or, the dataset should be saved locally in the last step as it takes a while to download and process
+# If the dataset was locally in the previous step as it takes a while to download and process:
 # inputDB <- fread("data/MPIDR.input.csv") # for testing purpose 
 inputDB[, table(Metric)]
 inputDB[, table(Measure)] # ASCFR  Cases Deaths  Tests
@@ -23,6 +23,7 @@ ggsave(p1, filename = paste0("fig/country/", cname0, ".png"), width = 11, height
 
 # a wrapped function to save a group of countries by supplying country names, results will be saved as one pdf or png file  
 save_country_plot_in_one(cnames = all_countries, png_or_pdf = "pdf")
+save_country_plot_in_one(cnames = all_countries, png_or_pdf = "png")
 
 # If needed, can save CFR (Death/Case) alone
 p2 <- make_country_plot(cname0, CFR_alone = TRUE)

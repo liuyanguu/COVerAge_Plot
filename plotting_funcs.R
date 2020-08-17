@@ -440,13 +440,15 @@ plot_aggregated_total_wrap <- function(
   g_grid <- cowplot::plot_grid(plotlist = g_list, ncol = n_col0)
   # height = 4 for each row 
   if(!dir.exists(folder)) dir.create(folder, recursive = TRUE)
-  ggsave(filename = file.path(folder, 
-                              paste0("Aggregated_plot_0to", max_interval, "_by", by_interval,"_", n_col0, "rows", ".png")),
+  filename0 <- file.path(folder, paste0("Aggregated_plot_0to", max_interval, "_by", by_interval,"_", n_col0, "rows", ".png"))
+  cat(filename0, "\n")
+  ggsave(filename = filename0,
         g_grid, 
          # save each 3-panel plot as 11*4
          width = 11*n_col0, 
          height = 4/n_col0*length(g_list), 
          limitsize = FALSE)
+  
   return(g_grid)
 }
 
