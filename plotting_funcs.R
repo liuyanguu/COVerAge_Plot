@@ -1,10 +1,5 @@
 # Functions to make descriptive plots for COVerAge dataset
-suppressPackageStartupMessages({
-  library("data.table")
-  library("ggplot2")
-  library("readr")
-  library("cowplot")
-})
+
 
 
 # 1. Data Source: MPIDR - Tim Riffe ---- 
@@ -13,18 +8,19 @@ suppressPackageStartupMessages({
 #' Get Data host on OSF: https://osf.io/mpwjq/
 get_MPIDR_inputDB <- function(){
   # the raw data on OSF: https://osf.io/mpwjq/
-  dt_age <- data.table::fread("https://osf.io/8uk9n/?action=download") # link updated 7/1/2020
-}
-get_MPIDR_output_5 <- function(){
-  dt_age <- data.table::fread("https://osf.io/5hyvs/?action=download")
-}
-get_MPIDR_output_10 <- function(){
-  dt_age <- data.table::fread("https://osf.io/wu5ve/?action=download")
+  # link updated 9/10/2020
+  osfr::osf_download(osfr::osf_retrieve_file("9dsfk"), conflicts = "overwrite") 
+  dt_age <- data.table::fread(cmd = 'unzip -cq inputDB.zip')
 }
 
-refresh_data <- function(save_locally = TRUE){
+get_MPIDR_output_10 <- function(){
+  osfr::osf_download(osfr::osf_retrieve_file("43ucn"), conflicts = "overwrite") 
+  dt_output_10 <- data.table::fread(cmd = 'unzip -cq inputDB.zip')
+}
+
+refresh_data <- function(save_locally = FALSE){
   # refresh raw dataset from OSF: https://osf.io/mpwjq/
-  message("Hold on, the file is over 130MB. This is going to take a while ... ")
+  message("Will download the inputDB zip file and read in...")
   # download the online data
   dt0 <- get_MPIDR_inputDB()
   dt0$Download_Date <- format(Sys.Date(), "%d-%m-%Y")
@@ -84,8 +80,8 @@ get_cnames <- function(dt1){
 
 
 
-# 3. Core plotting funcs. ------------------------------------------------------
-#' Core plot function to make one plot
+# 3. Core plotting function ------------------------------------------------------
+#' Core plot function to make a single age-pyramid plot
 #' reorder age intervals in the right way
 #' NA age group will be coded into "Unknown"
 plot.measure <- function(data, Measure0){
@@ -95,26 +91,41 @@ plot.measure <- function(data, Measure0){
   n_levels <- length(levels0)
   data_sex$Age <- factor(data_sex$Age, levels = levels0) # levels adjusted in order
   data_sex[is.na(Age), Age:= "Unknown"]
-  # adjust group names to e.g. 0-10,..., 60+
-  levels1 <- levels(data_sex$Age) # levels to be renamed 
+  # adjust group names (levels) to 0-10, 10-20, ..., 60+
+  levels1 <- levels(data_sex$Age) 
   levels2 <- shift(levels1, -1)
   levels3 <- paste0(levels1, "-", levels2)
   levels3[n_levels] <- paste0(levels1[n_levels], "+")
   levels3[grep("Unknown", levels3)] <- "Unknown"
   levels(data_sex$Age) <- levels3
-  # levels1[is.na(levels1)] <- "+"
-  # levels2 <- paste0(levels0,"-", levels1)
-  
+
   ngroup <- uniqueN(data_sex$Age)
-  max_value <- max(data_sex$Value, na.rm = TRUE) * 1.2
+  max_value <- max(data_sex$Value, na.rm = TRUE) * 1.25
   # put labels on the two sides of the bars:
-  data_sex[, label_position := ifelse(Sex == "Male", -Value-max_value*0.09,
-                                      Value + max_value*0.09)]  
+  data_sex[, label_position := ifelse(Sex == "Male", 
+                                      -Value - max_value*0.1,
+                                       Value + max_value*0.1)]  
+  data_sex[Age == "Unknown", 
+           label_position := ifelse(Sex == "Male", 
+                                    -Value - max_value*0.15,
+                                     Value + max_value*0.15)]  
+  # revise axis
+  scientific_10 <- function(x) {
+    parse(text=gsub("e", " %*%10^", scales::scientific_format()(x)))
+    # scales::scientific_format()(x)
+  }
+  scientific_10_abs <- function(x) {
+    parse(text=gsub("e", " %*%10^", scales::scientific_format()(abs(x))))
+    # scales::scientific_format()(abs(x))
+  }
   
+  # plot
   g <- ggplot(data = data_sex,
               mapping = aes(x = ifelse(Sex == "Male", yes = -Value, no = Value), 
-                            y = Age, fill = Sex, label = Value)
-  ) +
+                            y = Age, fill = Sex, 
+                            # label = if(max_value<1E5) prettyNum(Value,big.mark = ",") else formatC(Value, format = "e", digits = 2, width = 1)
+                            label = prettyNum(Value,big.mark = ",")
+                            )) +
     geom_col(width = 0.8) +
     # ggrepel::geom_text_repel(seed = 123,
     #                          direction = "x", 
@@ -124,7 +135,7 @@ plot.measure <- function(data, Measure0){
     #                          force_pull = 2, force = 1,
     #                          segment.size = 0.2, segment.color = "grey"
     # ) +
-    geom_text(aes(x = label_position), size = if(ngroup>10) 2 else 2.5, 
+    geom_text(aes(x = label_position), size = if(ngroup>10) 1.5 else 2.0, 
               hjust = 0.5
     )+
     labs(x = "", y ="", fill = "", 
@@ -141,15 +152,7 @@ plot.measure <- function(data, Measure0){
     g <- g+
       scale_fill_manual(values = c("Female" = "pink2", "Male" = "skyblue"))
   }
-  # revise axis
-  scientific_10 <- function(x) {
-    parse(text=gsub("e", " %*%10^", scales::scientific_format()(x)))
-    # scales::scientific_format()(x)
-  }
-  scientific_10_abs <- function(x) {
-    parse(text=gsub("e", " %*%10^", scales::scientific_format()(abs(x))))
-    # scales::scientific_format()(abs(x))
-  }
+
   
   # if(length(avail_sex)>1){
   #   g <-  g + scale_x_continuous(labels = abs,
@@ -437,10 +440,11 @@ plot_aggregated_total_wrap <- function(
                                   get_f_m = TRUE))
   g_list <- lapply(list(data_total1, data_total2), plot_aggregated_total)
   n_col0 <- ifelse(one_row, 2, 1)
+  n_row0 <- ifelse(one_row, 1, 2)
   g_grid <- cowplot::plot_grid(plotlist = g_list, ncol = n_col0)
   # height = 4 for each row 
   if(!dir.exists(folder)) dir.create(folder, recursive = TRUE)
-  filename0 <- file.path(folder, paste0("Aggregated_plot_0to", max_interval, "_by", by_interval,"_", n_col0, "rows", ".png"))
+  filename0 <- file.path(folder, paste0("Aggregated_plot_0to", max_interval, "_by", by_interval,"_", n_row0, "rows", ".png"))
   cat(filename0, "\n")
   ggsave(filename = filename0,
         g_grid, 

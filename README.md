@@ -5,7 +5,7 @@ COVerAGE-DB dataset: [https://github.com/timriffe/covid_age](https://github.com/
 - [Aggregated plots for all countries](https://github.com/liuyanguu/COVerAge_Plot/blob/master/README.md#aggregated-plots-for-all-countries)
 - [All the plots](https://github.com/liuyanguu/COVerAge_Plot/blob/master/README.md#all-together-aggregated--country-specific)
 
-The `main_script.R` walks through the process to make all the plots below (updated on 8/17/2020)
+The `main_script.R` walks through the process to make all the plots below (updated on `r Sys.Date()`)
 
 ## Download raw data from OSF: https://osf.io/mpwjq/
 ```{r}
@@ -55,7 +55,7 @@ g_total <- Map(plot_aggregated_total_wrap,
                max_interval = c(60, 60, 80, 80), by_interval = c(10, 20, 10, 20),
                one_row = FALSE)
 ```
-![Aggregated_plot_0to60_by10_1rows](fig/aggregated/Aggregated_plot_0to60_by10_1rows.png)
+![Aggregated_plot_0to60_by10_2rows](fig/aggregated/Aggregated_plot_0to60_by10_2rows.png)
 
 ## All together (aggregated + country-specific)
 Please refer to the code in `main_script.R`

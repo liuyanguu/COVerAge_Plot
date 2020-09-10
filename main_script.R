@@ -1,12 +1,19 @@
 # make MPIDR country-specific and aggregated plot
 # load data ---- 
 # 
+suppressPackageStartupMessages({
+  library("data.table")
+  library("ggplot2")
+  library("readr")
+  library("cowplot")
+  library("osfr")
+})
 source("plotting_funcs.R")
 source("00_Functions_convert_to_count.R")
-# recommend to save it locally after downloading and processing (set `save_locally` TRUE will create a "data/" folder locally)
-inputDB <- refresh_data(save_locally = TRUE) # re-download and calculate fraction into numbers (takes a while)
-# If the dataset was locally in the previous step as it takes a while to download and process:
-# inputDB <- fread("data/MPIDR.input.csv") # for testing purpose 
+
+# download input.DB as zip file and read in 
+inputDB <- refresh_data() # re-download and calculate fraction into numbers 
+# 
 inputDB[, table(Metric)]
 inputDB[, table(Measure)] # ASCFR  Cases Deaths  Tests
 dt1 <- clean_inputDB(inputDB = inputDB)
@@ -26,15 +33,15 @@ save_country_plot_in_one(cnames = all_countries, png_or_pdf = "pdf")
 save_country_plot_in_one(cnames = all_countries, png_or_pdf = "png")
 
 # If needed, can save CFR (Death/Case) alone
-p2 <- make_country_plot(cname0, CFR_alone = TRUE)
+# p2 <- make_country_plot(cname0, CFR_alone = TRUE)
 
-# aggregated plots for all countries 
+# aggregated plots for all countries ---- 
 # only choose those that has both case and death data and can calculate CFR
 # by assigning a common age interval, only those countries whose age interval are adaptable are used (i.e. through combining intervals into a wider one, 0-5 & 5-10 -> 0-10) 
 # Fewer countries will be included if set a stricter interval, or set `get_f_m = TRUE` to ask for sex-specific data
 data_total1 <- rbindlist(lapply(all_countries, get_dt_for_total, 
                                 data = dt1,
-                                target_interval = seq(0, 80, by = 10),
+                                target_interval = seq(0, 60, by = 10),
                                 get_f_m = TRUE))
 # a three-panel plot (Case, Death, CFR) for a specific given interval
 g1 <- plot_aggregated_total(data_total1)
@@ -48,12 +55,12 @@ g_list <- plot_aggregated_total_wrap(
   one_row = FALSE, # 2 rows if FALSE, 1st row is total, 2nd row is sex-specific
   folder = "fig/aggregated")
 
-# Make one plot for all (Aggregated + Country-specific) ---- 
-# Showing aggregated results 
-
-g_total <- Map(plot_aggregated_total_wrap, 
+# save plots for all aggregated ones ---- 
+# Total and sex-specific in two rows
+g_total <- Map(plot_aggregated_total_wrap,
                max_interval = c(60, 60, 80, 80), by_interval = c(10, 20, 10, 20),
                one_row = FALSE)
+# Total and sex-specific in one row 
 g_total <- Map(plot_aggregated_total_wrap, 
                max_interval = c(60, 60, 80, 80), by_interval = c(10, 20, 10, 20),
                one_row = TRUE)
