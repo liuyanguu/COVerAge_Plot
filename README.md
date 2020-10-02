@@ -11,7 +11,7 @@ The `main_script.R` walks through the process to make all the plots below (updat
 ```{r}
 source("plotting_funcs.R") # all the plotting functions
 source("00_Functions_convert_to_count.R") # borrow to distribute total if Metric is "Fraction"
-inputDB <- refresh_data(save_locally = TRUE) # download and save the data locally
+inputDB <- refresh_data() # re-download and calculate fraction into numbers 
 ```
 
 ## Country-specific plot 
