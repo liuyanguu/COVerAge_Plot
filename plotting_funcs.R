@@ -10,12 +10,21 @@ get_MPIDR_inputDB <- function(){
   # the raw data on OSF: https://osf.io/mpwjq/
   # link updated 9/10/2020
   osfr::osf_download(osfr::osf_retrieve_file("9dsfk"), conflicts = "overwrite") 
-  dt_age <- data.table::fread(cmd = 'unzip -cq inputDB.zip')
+  # dt_age <- data.table::fread(cmd = 'unzip -cq inputDB.zip')
+  unzip("inputDB.zip", junkpaths = TRUE)
+  dt_age <- data.table::fread("inputDB.csv")
+  unlink("inputDB.csv")
+  return(dt_age)
 }
 
 get_MPIDR_output_10 <- function(){
   osfr::osf_download(osfr::osf_retrieve_file("43ucn"), conflicts = "overwrite") 
-  dt_output_10 <- data.table::fread(cmd = 'unzip -cq inputDB.zip')
+  dt_output_10 <- data.table::fread(cmd = 'zip -cq Output_10.zip')
+}
+
+get_MPIDR_output_5 <- function(){
+  osfr::osf_download(osfr::osf_retrieve_file("7tnfh"), conflicts = "overwrite") 
+  dt_output_5 <- data.table::fread(cmd = 'unzip -cq Output_5.zip')
 }
 
 refresh_data <- function(save_locally = FALSE){
