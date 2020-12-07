@@ -5,7 +5,7 @@ COVerAGE-DB dataset: [https://github.com/timriffe/covid_age](https://github.com/
 - [Aggregated plots for all countries](https://github.com/liuyanguu/COVerAge_Plot/blob/master/README.md#aggregated-plots-for-all-countries)
 - [All the plots](https://github.com/liuyanguu/COVerAge_Plot/blob/master/README.md#all-together-aggregated--country-specific)
 
-The `main_script.R` walks through the process to make all the plots below (updated on 2020-11-13)
+The `main_script.R` walks through the process to make all the plots below (updated on 2020-12-06)
 
 ## Download raw data from OSF: https://osf.io/mpwjq/
 ```{r}
