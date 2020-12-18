@@ -75,3 +75,5 @@ g_grid_wref <- cowplot::plot_grid(g_grid1, Reference, ncol = 1,
                                   rel_heights = c(1, 0.05))
 ggsave(paste0("fig/MPIDR_aggregated",".png"), g_grid_wref, width = 24, height = 4*length(g_total), limitsize = FALSE)
 ggsave(paste0("fig/MPIDR_aggregated",".pdf"), g_grid_wref, width = 24, height = 4*length(g_total), limitsize = FALSE)
+
+unlink("inputDB.zip")
