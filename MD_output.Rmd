@@ -1,0 +1,144 @@
+---
+title: "MPIDR COVID Age Overview"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  html_document:
+    toc: TRUE
+    theme: "cerulean"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message=FALSE, fig.width=8, fig.height=6)
+```
+ 
+```{r}
+invisible(lapply(list.files(here::here("R"), full.names = TRUE), source))
+suppressPackageStartupMessages({
+  library("data.table")
+  library("ggplot2")
+  library("readr")
+  library("cowplot")
+  library("osfr")
+})
+# dt_wpp <- fread("data/WPP2019_dth_pop_joined.csv")
+dtJHU <- get.JHU.daily()
+dt5 <- get_MPIDR_output_5() # re-download and calculate fraction into numbers
+dt5 <- clean_outputDB(dt5)
+all_countries <- get_cnames(dt5)
+dt5_sex_1 <- pool_sex(dt5)
+dt5_sex_2 <- pool_sex(dt5, sex_specific = TRUE)
+dt5_sex <- rbindlist(list(dt5_sex_1, dt5_sex_2), use.names = TRUE)
+dt5_sex[, N:= uniqueN(Country), by = .(Measure, Sex)]
+
+# dt10 <- pool_age(dt5_sex, target_interval = seq(0, 100, by = 10))
+dt_sum <- dt5_sex[, .(MPIDR = sum(Value)), by = .(Measure, Sex, N, Age)]
+dt_sum_w <- dcast.data.table(dt_sum, Measure + Sex +N ~ Age, value.var = "MPIDR")
+dt_sum_w[, MPIDR:= rowSums(.SD), .SDcols = as.character(seq(0, 100, 5))]
+dt_sum_w[, Sum0_19:= rowSums(.SD), .SDcols = as.character(seq(0, 15, 5))]
+dt_sum_w[, Pcnt := round(Sum0_19/MPIDR*100, 1)]
+dt_sum_w[Measure == "Cases", `Age 0-19` := paste0(prettyNum(Sum0_19, big.mark = ","),
+                                                 " (", round(Pcnt), "%)")]
+dt_sum_w[Measure == "Deaths", `Age 0-19` := paste0(prettyNum(Sum0_19, big.mark = ","),
+" (", Pcnt, "%)")]
+```
+
+## Global confirmed cases and deaths  
+
+Sources: Max Planck Institute for Demographic Research (**MPIDR**) [COVeAGE-DB database](https://github.com/timriffe/covid_age) and [CSSE at Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data) (**JHU**)
+```{r}
+dt_sum_w[Measure=="Cases" & Sex=="Both", `JHU`:=sum(dtJHU$Confirmed, na.rm = TRUE)]
+dt_sum_w[Measure=="Deaths" & Sex=="Both", `JHU`:=sum(dtJHU$Deaths, na.rm = TRUE)]
+dt_sum_w[!is.na(JHU), `MPIDR/JHU(%)`:= paste0(round(`MPIDR`/`JHU`*100), "%")]
+dt_sum_w[!is.na(JHU), `MPIDR/JHU(%)`:= paste0(round(`MPIDR`/`JHU`*100), "%")]
+setnames(dt_sum_w, as.character(seq(0, 15, 5)), paste("Age", c("0-4", "5-9", "10-14", "15-19")))
+vars_wanted <- c("Measure", "Sex", "JHU", "MPIDR", "MPIDR/JHU(%)", "N", paste("Age", c("0-4", "5-9", "10-14", "15-19", "0-19")))
+dtt <- dt_sum_w[,..vars_wanted]
+# Table Cases
+cols1 <- c("JHU", "MPIDR", paste("Age", c("0-4", "5-9", "10-14", "15-19")))
+dtt[, (cols1) := lapply(.SD, prettyNum, big.mark = ","), .SDcols = cols1]
+dtt[JHU=="NA", JHU:=""]
+dtt[Sex=="Both", Sex := "Total"]
+setnames(dtt, "N", "MPIDR Number\nof Countries")
+setnames(dtt, paste("Age", c("0-4", "5-9", "10-14", "15-19", "0-19")), paste("Age\n", c("0-4", "5-9", "10-14", "15-19", "0-19")))
+
+dtca <- dtt[Measure=="Cases"][,Measure:=NULL]
+dtdt <- dtt[Measure=="Deaths"][,Measure:=NULL]
+
+```
+
+### Global confirmed cases
+
+```{r}
+print_table <- function(data){
+  DT::datatable(data, rownames = FALSE, 
+                colnames = colnames(data),
+                options = list(dom = 't')
+  )
+}
+print_table(dtca)
+```
+
+### Global deaths  
+
+```{r}
+print_table(dtdt)
+```
+
+
+## Age pyramid using MPIDR COVeAGE-DB database
+```{r, fig.width=14, fig.height=10, message=FALSE, eval = T}
+# aggregated plots for all countries ---- 
+all_countries <- get_cnames(dt5)
+data_total1 <- rbindlist(lapply(all_countries, get_dt_for_total, 
+                                data = dt5,
+                                target_interval = seq(0, 90, by = 5),
+                                get_f_m = FALSE))
+data_total2 <- rbindlist(lapply(all_countries, get_dt_for_total, 
+                                data = dt5,
+                                target_interval = seq(0, 90, by = 5),
+                                get_f_m = TRUE))
+
+# a three-panel plot (Case, Death, CFR) for a specific given interval
+g1 <- plot_aggregated_total(data_total1, big_plot = TRUE)
+g2 <- plot_aggregated_total(data_total2, by_sex = TRUE, big_plot = TRUE)
+
+# vector of countries used 
+c1 <- sort(unique(data_total1$Country))
+c2 <- sort(unique(data_total2$Country))
+
+WorldRobinson <- readRDS(here::here("data/NEWorldRobinson.rds"))
+cnames_new <- revise_map_name(get_cnames(dt5))
+
+c1_new <- revise_map_name(c1)
+c2_new <- revise_map_name(c2)
+
+map1 <- plot_ava_map(highlight_cnames = c1_new)
+map2 <- plot_ava_map(highlight_cnames = c2_new)
+
+```
+
+### Disaggregated by age  
+
+**Using `r length(c1)` countries with data on confirmed cases and deaths**  
+
+```{r, fig.width=8, fig.height=3.5}
+map1
+```
+
+```{r, fig.width=14, fig.height = 6}
+g1
+```
+
+### Disaggregated by age and sex  
+
+**Using `r length(c2)` countries with data on sex-specific confirmed cases and deaths**  
+
+```{r, fig.width = 8, fig.height=3.5}
+map2
+```
+
+```{r, fig.width = 14, fig.height = 6}
+g2
+```
+
