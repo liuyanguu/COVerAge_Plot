@@ -22,6 +22,7 @@ suppressPackageStartupMessages({
   library("osfr")
 })
 # dt_wpp <- fread("data/WPP2019_dth_pop_joined.csv")
+WorldRobinson <- readRDS(here::here("data/NEWorldRobinson.rds"))
 dtJHU <- get.JHU.daily()
 dt5 <- get_MPIDR_output_5() # re-download and calculate fraction into numbers
 dt5 <- clean_outputDB(dt5)
@@ -107,7 +108,6 @@ g2 <- plot_aggregated_total(data_total2, by_sex = TRUE, big_plot = TRUE)
 c1 <- sort(unique(data_total1$Country))
 c2 <- sort(unique(data_total2$Country))
 
-WorldRobinson <- readRDS(here::here("data/NEWorldRobinson.rds"))
 cnames_new <- revise_map_name(get_cnames(dt5))
 
 c1_new <- revise_map_name(c1)
