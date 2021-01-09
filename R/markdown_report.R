@@ -1,3 +1,12 @@
+# functions for rmd file 
+# 
+print_table <- function(data){
+  DT::datatable(data, rownames = FALSE, 
+                colnames = colnames(data),
+                options = list(dom = 't')
+  )
+}
+
 # data processing 
 # the data is cumulative by date, so sometimes subset the latest date
 subset.latest.date <- function(dt){
@@ -22,7 +31,8 @@ get.JHU.daily <- function(){
   return(dt_JUH)
 }
 
-#' pool f and m into Both sex
+#' pool f and m into Both sex, remove NA Value
+#' 
 pool_sex <- function(dt5, sex_specific = FALSE){
   dt5 <- copy(dt5)[Region == "All" & Age!="TOT" & !is.na(Value)]
   if(sex_specific) return(dt5[Sex!="Both",.(Country, Measure, Age, Sex, Value)])

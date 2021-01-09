@@ -19,22 +19,26 @@ get_MPIDR_inputDB <- function(){
 }
 
 get_MPIDR_output_10 <- function(){
-  osfr::osf_download(osfr::osf_retrieve_file("43ucn"), conflicts = "overwrite") 
+  osfr::osf_download(osfr::osf_retrieve_file("43ucn"), conflicts = "overwrite",
+                     path = here::here("data/"))
   # dt_output_10 <- data.table::fread(cmd = 'zip -cq Output_10.zip')
-  unzip("Output_10.zip", junkpaths = TRUE)
-  dt_output_10 <- data.table::fread("Output_10.csv")
-  unlink("Output_10.zip")
+  unzip("data/Output_10.zip", junkpaths = TRUE, exdir = here::here("data"))
+  dt_output_10 <- data.table::fread(here::here("data/Output_10.csv"))
+  file.remove(here::here("data/Output_10.zip"))
+  file.remove(here::here("data/Output_10.csv"))
   dt_output_10$Download_Date <- format(Sys.Date(), "%m-%d-%Y")
   return(dt_output_10)
   
 }
 
 get_MPIDR_output_5 <- function(){
-  osfr::osf_download(osfr::osf_retrieve_file("7tnfh"), conflicts = "overwrite") 
+  osfr::osf_download(osfr::osf_retrieve_file("7tnfh"), conflicts = "overwrite")
+  # used to work but not work now: 
   # dt_output_5 <- data.table::fread(cmd = 'unzip -cq Output_5.zip')
-  unzip("Output_5.zip", junkpaths = TRUE)
-  dt_output_5 <- data.table::fread("Output_5.csv")
-  unlink("Output_5.zip")
+  unzip(here::here("data/Output_5.zip"), junkpaths = TRUE, exdir = here::here("data"))
+  dt_output_5 <- data.table::fread(here::here("data/Output_5.csv"))
+  file.remove(here::here("data/Output_5.zip"))
+  file.remove(here::here("data/Output_5.csv"))
   dt_output_5$Download_Date <- format(Sys.Date(), "%m-%d-%Y")
   return(dt_output_5)
 }
@@ -89,16 +93,19 @@ clean_inputDB <- function(inputDB){
 }
 
 clean_outputDB <- function(outputDB){
-  outputDB <- melt.data.table(outputDB, measure.vars = c("Cases", "Deaths", "Tests"),
-                              variable.name = "Measure", value.name = "Value")
-  outputDB <- outputDB[Region=="All" & Measure!="Tests"]
-  outputDB[, Value:=round(Value)] # since the calculated count could have decimal
+  outputDB[, Tests:=NULL]
+  outputDB <- outputDB[Region=="All"]
+  
   # latest date by Measure, Country, Sex
-  outputDB[, max_date:= max(Date), by = .(Measure, Country, Sex)]
+  outputDB[, max_date:= max(Date), by = .(Country, Sex)]
   outputDB <- outputDB[Date==max_date]
   outputDB[, max_date:=NULL]
   outputDB$Sex <- as.factor(outputDB$Sex)
   levels(outputDB$Sex) <- c("Both", "Female", "Male")
+  
+  outputDB <- melt.data.table(outputDB, measure.vars = c("Cases", "Deaths"),
+                              variable.name = "Measure", value.name = "Value")
+  outputDB[, Value:=round(Value)] # since the calculated count could have decimal
   return(outputDB)
 }
 
@@ -122,7 +129,10 @@ get_cnames <- function(dt1){
 #' @param big_plot is this a group plot for all countries or just showing one,
 #'   if TRUE, font will be larger, if FALSE, font will be smaller
 #'   
-plot.measure <- function(data, Measure0, big_plot = FALSE){
+plot.measure <- function(data, 
+                         Measure0, 
+                         big_plot = FALSE,
+                         hide_legend = FALSE){
   
   data_sex <- copy(data[Measure==Measure0])
   levels0 <- unique(sort(data_sex$Age))
@@ -209,6 +219,8 @@ plot.measure <- function(data, Measure0, big_plot = FALSE){
     if(max_value>1E4){
       g <-  g + scale_x_continuous(labels =scientific_10, limits = c(0, max_value))}
   }
+  
+  if(hide_legend) g <- g + theme(legend.position = "none")
   return(g)
 } 
 
@@ -454,13 +466,15 @@ revise.data.total <- function(data_total){
 plot_aggregated_total <- function(data_total, by_sex = FALSE, big_plot = FALSE){
   # further aggregated by country 
   data_total <- revise.data.total(data_total)
-  total_title <- paste0("Aggregated Results of ", data_total$n_country[1], " Countries")
-  if(by_sex) total_title <- paste(total_title, "by Sex")
+  total_title <- paste0("Aggregated results of ", data_total$n_country[1], " countries")
+  total_title <- paste(total_title, if(by_sex) "by sex")
   title <- cowplot::ggdraw() + 
     draw_label(total_title, fontface = 'bold', x = 0, hjust = 0) + 
     theme(plot.margin = margin(0, 0, 0, 7))
-  plots_by_measure <- lapply(unique(data_total$Measure), plot.measure, data = data_total,
-                             big_plot = big_plot)
+  plots_by_measure <- lapply(c("Cases", "Deaths"), plot.measure, data = data_total,
+                             big_plot = big_plot, hide_legend = TRUE)
+  plots_by_measure[[3]] <- plot.measure(data = data_total, Measure0 = "CFR",
+                                        big_plot = big_plot, hide_legend = if(by_sex) FALSE else TRUE)
   gg <- cowplot::plot_grid(plotlist = plots_by_measure, nrow = 1)    
   gg <- cowplot::plot_grid(title, gg, ncol = 1,
                            rel_heights = c(0.1, 1))

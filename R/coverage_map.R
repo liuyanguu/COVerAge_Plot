@@ -12,10 +12,12 @@ revise_map_name <- function(cnames){
     "United States" = "United States of America",
     "USA" = "United States of America",
     "Dominican Republic" = "Dominican Rep.",
-    "Central African Republic" = "Central African Rep.",
-    "Malta" = NA)
-  cnames <- sort(unique(na.omit(get.match(cnames, new_list = new_name))))
-  if(length(cnames[!cnames%in%WorldRobinson$NAME])>0)message("Check country names not in the map: ", paste(cnames[!cnames%in%WorldRobinson$NAME], collapse = ", "))
+    "Central African Republic" = "Central African Rep."
+    )
+  cnames <- get.match(cnames, new_list = new_name)
+  cnames_miss <- sort(unique(cnames[!cnames%in%WorldRobinson$NAME]))
+  if(length(cnames_miss)>0)message("Check country names not in the map: ", 
+                                                             paste(cnames_miss, collapse = ", "))
   return(cnames)
 }
 

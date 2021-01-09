@@ -1,10 +1,10 @@
 ---
 title: "MPIDR/INED COVID-19 cases and deaths by age and sex"
-date: "`r format(Sys.time(), '%d %B %Y')`"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
-  html_document:
+  word_document:
     toc: FALSE
-    theme: "cerulean"
+always_allow_html: true
 ---
 
 
@@ -51,10 +51,10 @@ dt_sum_w[Measure == "Deaths", `Age 0-19` := paste0(prettyNum(Sum0_19, big.mark =
 
 dt_sum_w[Measure=="Cases" & Sex=="Both", `JHU`:=sum(dtJHU$Confirmed, na.rm = TRUE)]
 dt_sum_w[Measure=="Deaths" & Sex=="Both", `JHU`:=sum(dtJHU$Deaths, na.rm = TRUE)]
-dt_sum_w[!is.na(JHU), `MPIDR_JHU`:= paste0(round(`MPIDR`/`JHU`*100), "%")]
-dt_sum_w[!is.na(JHU), `MPIDR_JHU`:= paste0(round(`MPIDR`/`JHU`*100), "%")]
+dt_sum_w[!is.na(JHU), `COVerAGE-DB/JHU(%)`:= paste0(round(`MPIDR`/`JHU`*100), "%")]
+dt_sum_w[!is.na(JHU), `COVerAGE-DB/JHU(%)`:= paste0(round(`MPIDR`/`JHU`*100), "%")]
 setnames(dt_sum_w, as.character(seq(0, 15, 5)), paste("Age", c("0-4", "5-9", "10-14", "15-19")))
-vars_wanted <- c("Measure", "Sex", "JHU", "MPIDR", "MPIDR_JHU", paste("Age", c("0-4", "5-9", "10-14", "15-19", "0-19")))
+vars_wanted <- c("Measure", "Sex", "JHU", "MPIDR", "COVerAGE-DB/JHU(%)", paste("Age", c("0-4", "5-9", "10-14", "15-19", "0-19")))
 dtt <- dt_sum_w[,..vars_wanted]
 # Table Cases
 cols1 <- c("JHU", "MPIDR", paste("Age", c("0-4", "5-9", "10-14", "15-19")))
@@ -64,10 +64,10 @@ dtt[Sex=="Both", Sex := "Total"]
 # setnames(dtt, "N", "MPIDR Number\nof Countries")
 setnames(dtt, paste("Age", c("0-4", "5-9", "10-14", "15-19", "0-19")), paste("Age\n", c("0-4", "5-9", "10-14", "15-19", "0-19")))
 setnames(dtt, "MPIDR", "COVerAGE-DB")
-setnames(dtt, "MPIDR_JHU", "COVerAGE-DB/JHU(%)")
+
 # table to print
 dt1 <- dtt[Sex=="Total"][,Sex:=NULL]
-dt2 <- dtt[Sex!="Total"][, `COVerAGE-DB/JHU(%)`:=NULL][, JHU:=NULL]
+dt2 <- dtt[Sex!="Total"][, `COVerAGE-DB/JHU(%)`:=NULL]
 
 # countries with case 
 # In the `dt5_sex` dataset, countries with single/both sex always have total
@@ -134,7 +134,7 @@ Table 1. The total cases and deaths reported by Johns Hopkins University (JHU) a
 print_table(dt1)
 ```
 
-Figure 3. The age pyramid by 5-year age interval for COVID-19 total cases, deaths and case fatality rate (CFR), which is the number of death divided by case for each age group. In order to calculate the CFR, only countries with both cases and deaths data are used.
+Figure 3. The age pyramid by 5-year age interval for COVID-19 total cases, deaths and crude fatality rate (CFR), which is the number of death divided by case for each age group. In order to calculate the CFR, only countries with both cases and deaths data are used.
 
 ```{r, fig.width=14, fig.height=6}
 g1
@@ -142,7 +142,7 @@ g1
 
 
 
-### Cases and deaths by age and sex
+### MPIDR confirmed cases and deaths by age and sex
 
 Figure 4. The `r length(c_case_sex)` countries with national data on sex-specific counts of COVID-19 cases.
 
@@ -156,13 +156,13 @@ Figure 5. The `r length(c_death_sex)` countries with national data on sex-specif
 map_death_sex
 ```
 
-Table 2. The sex-specific cases and deaths reported by Johns Hopkins University (JHU) and COVerAGE-DB. The harmonized data for the age groups 0-4, 5-9, 10-14, 15-19 and 0-19 are shown in the table. 
+Table 2. The sex-specific cases and deaths in the COVerAGE-DB dataset. The harmonized data for the age groups 0-4, 5-9, 10-14, 15-19, 0-19 and its share in the total are shown in the table. 
 
 ```{r}
 print_table(dt2)
 ```
 
-Figure 4. The sex-specific age pyramid by 5-year age interval for COVID-19 total cases, deaths and case fatality rate (CFR)
+Figure 4. The sex-specific age pyramid by 5-year age interval for COVID-19 total cases, deaths and crude fatality rate (CFR)
 
 ```{r, fig.width=14, fig.height=6}
 g2
