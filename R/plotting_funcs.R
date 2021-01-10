@@ -104,7 +104,8 @@ clean_outputDB <- function(outputDB){
   levels(outputDB$Sex) <- c("Both", "Female", "Male")
   
   outputDB <- melt.data.table(outputDB, measure.vars = c("Cases", "Deaths"),
-                              variable.name = "Measure", value.name = "Value")
+                              variable.name = "Measure", value.name = "Value",
+                              variable.factor = FALSE)
   outputDB[, Value:=round(Value)] # since the calculated count could have decimal
   return(outputDB)
 }

@@ -1,0 +1,7 @@
+name: "COVerAge_Plot"
+output_dir: "docs"
+navbar:
+  title: "HOME"
+output:
+  html_document:
+    theme: cosmo

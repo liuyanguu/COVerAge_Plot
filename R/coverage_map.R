@@ -21,12 +21,15 @@ revise_map_name <- function(cnames){
   return(cnames)
 }
 
+
 #' make coverage map
 plot_ava_map <- function(highlight_cnames){
+  
   highlight_cnames <- highlight_cnames[highlight_cnames%in%WorldRobinson$NAME]
   World_Region <- WorldRobinson[WorldRobinson$NAME %in% highlight_cnames,]
   if(length(World_Region)==0) stop("World_Region has length 0 for plotting")
   message("World_Region has " , length(World_Region), " countries")
+  
   World_Region_sp <- spTransform(World_Region, CRS("+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"))
   gWorld <- ggplot() +
     geom_polygon(data = WorldRobinson, aes(x = long, y = lat, group = group), fill="lightgray", colour = "white") +
@@ -37,11 +40,32 @@ plot_ava_map <- function(highlight_cnames){
     #                           bg.r = 0.15,
     #                           bg.color = "white",
     #                           inherit.aes = FALSE) + 
+    ggthemes::theme_map() 
+  return(gWorld)
+}
+ 
+plot_ava_map2 <- function(dt_ava2){
+  highlight_cnames <- dt_ava2$Country_new
+  highlight_cnames <- highlight_cnames[highlight_cnames%in%WorldRobinson$NAME]
+  World_Region <- WorldRobinson[WorldRobinson$NAME %in% highlight_cnames,]
+  if(length(World_Region)==0) stop("World_Region has length 0 for plotting")
+  message("World_Region has " , length(World_Region), " countries")
+  
+  geo2 <- dplyr::left_join(geo_df,  dt_ava2, by = c("id" = "Country_new"))
+  cols_data <- c("Cases_Deaths" = "#0058AB",  "Cases" = "#1CABE2", "Deaths" = "#69DBFF")
+  geo2$nMeasure <- factor(geo2$nMeasure, levels = names(cols_data))
+
+  gWorld <- ggplot() +
+    geom_polygon(data = WorldRobinson, aes(x = long, y = lat, group = group), fill="lightgray", colour = "white") +
+    geom_polygon(data = geo2[!is.na(geo2$nMeasure),], aes(x = long, y = lat, group = group, fill = nMeasure), colour = "white") +
+    scale_fill_manual(values = cols_data,
+                      labels = c("Cases and Deaths", "Cases alone", "Deaths alone"))  + 
     ggthemes::theme_map() + 
-    theme(legend.position = c(0.6, 0.2),
+    theme(legend.position = "bottom",
           legend.direction = "horizontal",
           legend.justification = c("bottom"),
-          legend.title = element_text(size=18),  # font size of the legend 
-          legend.text = element_text(size=16))
+          legend.title = element_blank(),
+          legend.key.size = unit(0.5, "cm"),
+          legend.text = element_text(size=10))
   return(gWorld)
 }

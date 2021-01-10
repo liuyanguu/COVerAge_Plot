@@ -1,0 +1,145 @@
+---
+title: "MPIDR/INED COVID-19 cases and deaths by age and sex"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message=FALSE, fig.width=8, fig.height=6)
+```
+ 
+```{r}
+invisible(lapply(list.files(here::here("R"), full.names = TRUE), source))
+suppressPackageStartupMessages({
+  library("data.table")
+  library("ggplot2")
+  library("readr")
+  library("cowplot")
+  library("osfr")
+})
+WorldRobinson <- readRDS(here::here("data/NEWorldRobinson.rds"))
+geo_df <- readRDS(here::here("data/WorldRobinson_df.rds"))
+dtJHU <- get.JHU.daily()
+dt5_ori <- download_covid(data = "Output_5", temp = TRUE, 
+                          verbose = FALSE, progress = FALSE, return = "data.table") 
+dt5 <- clean_outputDB(dt5_ori)
+```
+
+```{r}
+all_countries <- get_cnames(dt5)
+dt5_sex_1 <- pool_sex(dt5)
+dt5_sex_2 <- pool_sex(dt5, sex_specific = TRUE)
+dt5_sex <- rbindlist(list(dt5_sex_1, dt5_sex_2), use.names = TRUE)
+
+# adjust country names now:
+cnames_new <- revise_map_name(get_cnames(dt5_sex))
+dt5_sex$Country_new <- revise_map_name(dt5_sex$Country)
+# N answers for how many countries have cases/deaths
+dt5_sex[, N:= uniqueN(Country_new), by = .(Measure, Sex)] 
+
+# dt_ava shows if there is only case, or only deaths or both for each country by sex
+dt_ava <- copy(dt5_sex)[, nMeasure := paste(sort(unique(Measure)), collapse = "_"), by = .(Sex, Country_new)]
+dt_ava[Sex!="Both", Sex:= "Sex-specific"]
+dt_ava2 <- unique(dt_ava[,.(Country_new, Sex, nMeasure)])
+
+
+# summary table to print
+dtt <- get_summary_table(dt5_sex)
+dt1 <- dtt[Sex=="Total"][,Sex:=NULL]
+dt2 <- dtt[Sex!="Total"][, `COVerAGE-DB/JHU(%)`:=NULL][, JHU:=NULL]
+
+# one map each 
+# In the `dt5_sex` dataset, countries with single/both sex always have total
+c_case <- dt5_sex[Measure=="Cases" & Sex == "Both", unique(Country_new)]
+c_death <- dt5_sex[Measure=="Deaths" & Sex == "Both", unique(Country_new)]
+c_case_sex<- dt5_sex[Measure=="Cases" & Sex != "Both", unique(Country_new)]
+c_death_sex <- dt5_sex[Measure=="Deaths" & Sex != "Both", unique(Country_new)]
+
+# map_case <- plot_ava_map(highlight_cnames = c_case)
+# map_death <- plot_ava_map(highlight_cnames = c_death)
+# map_case_sex <- plot_ava_map(highlight_cnames = c_case_sex)
+# map_death_sex <- plot_ava_map(highlight_cnames = c_death_sex)
+
+map_total <- plot_ava_map2(dt_ava2[Sex == "Both"])
+map_sex_specific <- plot_ava_map2(dt_ava2[Sex == "Sex-specific"])
+
+# aggregated plots for all countries ---- 
+all_countries <- get_cnames(dt5)
+data_total1 <- rbindlist(lapply(all_countries, get_dt_for_total, 
+                                data = dt5,
+                                target_interval = seq(0, 90, by = 5),
+                                get_f_m = FALSE))
+data_total2 <- rbindlist(lapply(all_countries, get_dt_for_total, 
+                                data = dt5,
+                                target_interval = seq(0, 90, by = 5),
+                                get_f_m = TRUE))
+
+# a three-panel plot (Case, Death, CFR) for a specific given interval
+g1 <- plot_aggregated_total(data_total1, big_plot = TRUE)
+g2 <- plot_aggregated_total(data_total2, by_sex = TRUE, big_plot = TRUE)
+
+```
+
+**Purpose**  
+
+Population characteristics are key to understanding the prevalence, spread and fatality of COVID-19 across countries. The COVID Age Database (COVerAGE-DB) provides a valuable insight into age-and sex-specific patterns of COVID-19 cases and deaths.
+
+**Source of data**
+
+COVerAGE-DB is an open-access database including cumulative counts of confirmed COVID-19 cases, deaths, and tests by age and sex. Original data and sources are provided alongside data and measures in standardized and age-harmonized formats. The data were extracted from reports published by official governmental institutions in a variety of formats.
+The [project page](https://github.com/timriffe/covid_age) and the [medRxiv paper](https://www.medrxiv.org/content/10.1101/2020.09.18.20197228v2) contain the technical details. 
+
+The database is still in development. Today it includes `r dt5_ori[, uniqueN(Country)]` countries and `r dt5_ori[Region!="All", uniqueN(Region)]` subnational areas.
+
+
+**Limitation**  
+
+The limitation of the COVerAGE-DB is the heterogeneous qualities of the underlying data, which is also difficult to evaluate. Case and death counts are likely underestimated, with underestimation expected to vary by age. As the definitions and practices of counting COVID-19 cases and deaths vary in each country, the data should be interpreted with caution when making comparisons across countries or within the same country over time.
+
+### Cases and deaths by age
+
+Figure 1. The `r length(c_case)` countries with national data on counts of COVID-19 cases and the `r length(c_death)` countries with national data on counts of COVID-19 deaths.
+
+```{r, fig.width=8, fig.height=4}
+map_total
+```
+
+Table 1. The total cases and deaths reported by Johns Hopkins University (JHU) and extracted from the COVerAGE-DB database. The fourth column (COVerAGE-DB/JHU) shows the ratio of total case and death counts from COVerAGE-DB to those reported by JHU. The harmonized data of age groups 0-4, 5-9, 10-14, 15-19 are listed in the table. Their counts sum to age group 0-19 and the percentage values show this age group’s proportion in all age groups. 
+
+```{r}
+print_table(dt1)
+```
+
+Figure 2. Population distribution of global COVID-19 cases, deaths and case fatality rate (CFR), with 5-year age interval. CFR is calculated by dividing death counts by case counts for each age group. In calculating CFR, only countries with both case and death data are counted.
+
+```{r, fig.width=14, fig.height=6}
+g1
+```
+
+
+### Cases and deaths by age and sex
+
+Figure 3. The `r length(c_case_sex)` countries with national data on sex-specific counts of COVID-19 cases and the `r length(c_death_sex)` countries with national data on sex-specific counts of COVID-19 deaths.
+
+```{r, fig.width=8, fig.height=4}
+map_sex_specific
+```
+
+Table 2. Sex-specific counts of COVID-19 cases and deaths from COVerAGE-DB. The harmonized data for age groups 0-4, 5-9, 10-14, 15-19 and 0-19 as well as the proportion of age group 0-19 are shown in the table.
+
+```{r}
+print_table(dt2)
+```
+
+Figure 4. Population distribution of COVID-19 cases, deaths and case fatality rate (CFR), by sex and age (5-year age interval). In calculating CFR, only countries with both case and death data are counted.
+
+```{r, fig.width=14, fig.height=6}
+g2
+```
+
+
+## Reference  
+
+Riffe, T., Acosta, E., and The COVerAGE-DB team (2020). COVerAGE-DB: A database of COVID-19 cases and deaths by age. medRxiv https://doi.org/10.1101/2020.09.18.20197228
+
+Dong E, Du H, Gardner L. An interactive web-based dashboard to track COVID-19 in real time. Lancet Inf Dis. 20(5):533-534. https://doi.org/10.1016/S1473-3099(20)30120-1

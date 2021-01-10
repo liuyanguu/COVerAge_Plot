@@ -1,4 +1,36 @@
 # functions for rmd file 
+
+# make summary table
+get_summary_table <- function(dt5_sex){
+  dt_sum <- dt5_sex[, .(MPIDR = sum(Value)), by = .(Measure, Sex, N, Age)]
+  dt_sum_w <- dcast.data.table(dt_sum, Measure + Sex +N ~ Age, value.var = "MPIDR")
+  dt_sum_w[, MPIDR:= rowSums(.SD), .SDcols = as.character(seq(0, 100, 5))]
+  dt_sum_w[, Sum0_19:= rowSums(.SD), .SDcols = as.character(seq(0, 15, 5))]
+  dt_sum_w[, Pcnt := round(Sum0_19/MPIDR*100, 1)]
+  dt_sum_w[Measure == "Cases", `Age 0-19` := paste0(prettyNum(Sum0_19, big.mark = ","),
+                                                    " (", round(Pcnt), "%)")]
+  dt_sum_w[Measure == "Deaths", `Age 0-19` := paste0(prettyNum(Sum0_19, big.mark = ","),
+                                                     " (", Pcnt, "%)")]
+  
+  dt_sum_w[Measure=="Cases" & Sex=="Both", `JHU`:=sum(dtJHU$Confirmed, na.rm = TRUE)]
+  dt_sum_w[Measure=="Deaths" & Sex=="Both", `JHU`:=sum(dtJHU$Deaths, na.rm = TRUE)]
+  dt_sum_w[!is.na(JHU), `MPIDR_JHU`:= paste0(round(`MPIDR`/`JHU`*100), "%")]
+  dt_sum_w[!is.na(JHU), `MPIDR_JHU`:= paste0(round(`MPIDR`/`JHU`*100), "%")]
+  setnames(dt_sum_w, as.character(seq(0, 15, 5)), paste("Age", c("0-4", "5-9", "10-14", "15-19")))
+  vars_wanted <- c("Measure", "Sex", "JHU", "MPIDR", "MPIDR_JHU", paste("Age", c("0-4", "5-9", "10-14", "15-19", "0-19")))
+  dtt <- dt_sum_w[,..vars_wanted]
+  # Table Cases
+  cols1 <- c("JHU", "MPIDR", paste("Age", c("0-4", "5-9", "10-14", "15-19")))
+  dtt[, (cols1) := lapply(.SD, prettyNum, big.mark = ","), .SDcols = cols1]
+  dtt[JHU=="NA", JHU:=""]
+  dtt[Sex=="Both", Sex := "Total"]
+  # setnames(dtt, "N", "MPIDR Number\nof Countries")
+  setnames(dtt, paste("Age", c("0-4", "5-9", "10-14", "15-19", "0-19")), paste("Age\n", c("0-4", "5-9", "10-14", "15-19", "0-19")))
+  setnames(dtt, "MPIDR", "COVerAGE-DB")
+  setnames(dtt, "MPIDR_JHU", "COVerAGE-DB/JHU(%)")
+  return(dtt)
+}
+
 # 
 print_table <- function(data){
   DT::datatable(data, rownames = FALSE, 
