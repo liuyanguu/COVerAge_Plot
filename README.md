@@ -1,8 +1,8 @@
 # COVerAge_Plot : Age Pyramid for the COVerAGE-DB Dataset
 
-A summary Github pages: [https://liuyanguu.github.io/COVerAge_Plot/](https://liuyanguu.github.io/COVerAge_Plot/)
+[A new summary Github pages](https://liuyanguu.github.io/COVerAge_Plot/)
 
-COVerAGE-DB dataset: [https://github.com/timriffe/covid_age](https://github.com/timriffe/covid_age)
+[COVerAGE-DB dataset project page](https://github.com/timriffe/covid_age)
 
 - [Country-specific plot](https://github.com/liuyanguu/COVerAge_Plot/blob/master/README.md#country-specific-plot)
 - [Aggregated plots for all countries](https://github.com/liuyanguu/COVerAge_Plot/blob/master/README.md#aggregated-plots-for-all-countries)
