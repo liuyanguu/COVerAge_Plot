@@ -1,3 +1,5 @@
+# using the harmonized output dataset
+
 suppressPackageStartupMessages({
   library("data.table")
   library("ggplot2")
@@ -5,23 +7,21 @@ suppressPackageStartupMessages({
   library("cowplot")
   library("osfr")
 })
-source("R/plotting_funcs.R")
-source("R/00_Functions_convert_to_count.R")
+invisible(lapply(list.files(here::here("R"), full.names = TRUE), source))
 
 # download input.DB as zip file and read in 
-dt5 <- get_MPIDR_output_5() # re-download and calculate fraction into numbers
-dt5 <- fread("Output_5.csv")
-dt5 <- clean_outputDB(dt5)
-# dt10 <- get_MPIDR_output_10() # re-download and calculate fraction into numbers 
-# 
+dt5_ori <- download_covid(data = "Output_5", temp = TRUE, 
+                          verbose = FALSE, progress = FALSE, return = "data.table") 
+dt5 <- clean_outputDB(dt5_ori)
+
 
 # country-specific plot ---- 
 all_countries <- get_cnames(dt5)
 cname0 <- all_countries[1]
+cname0 <- "Nepal"
 p1 <- make_country_plot(cname0, dt1 = dt5)
 if(!dir.exists("fig_harmonized5/country/")) dir.create("fig_harmonized5/country", recursive = TRUE)
 ggsave(p1, filename = paste0("fig_harmonized5/country/", cname0, ".png"), width = 11, height = 4)
-
 
 # a wrapped function to save a group of countries by supplying country names, results will be saved as one pdf or png file  
 save_country_plot_in_one(cnames = all_countries, png_or_pdf = "pdf", dt1 = dt5,

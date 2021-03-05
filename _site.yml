@@ -2,6 +2,11 @@ name: "COVerAge_Plot"
 output_dir: "docs"
 navbar:
   title: "HOME"
+  left: 
+    - text: "Plots for COVerAGE-DB"
+      href: index.html
+    - text: "Country profile"
+      href: country_report.html
 output:
   html_document:
     theme: cosmo

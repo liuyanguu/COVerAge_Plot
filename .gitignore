@@ -6,4 +6,10 @@
 .csv
 .docx
 .pdf
-data
+.httr-oauth
+.secrets
+data_backup
+data_raw
+NaturalEarth
+old
+backup

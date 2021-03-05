@@ -1,6 +1,5 @@
 ---
-title: "MPIDR/INED COVID-19 cases and deaths by age and sex"
-date: "`r format(Sys.time(), '%d %B %Y')`"
+title: "Visualize the output dataset for COVerAGE-DB"
 ---
 
 
@@ -8,7 +7,7 @@ date: "`r format(Sys.time(), '%d %B %Y')`"
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message=FALSE, fig.width=8, fig.height=6)
 ```
  
-```{r}
+```{r, include = FALSE}
 invisible(lapply(list.files(here::here("R"), full.names = TRUE), source))
 suppressPackageStartupMessages({
   library("data.table")
@@ -16,127 +15,192 @@ suppressPackageStartupMessages({
   library("readr")
   library("cowplot")
   library("osfr")
+  library("countrycode")
 })
+source_1 <- "COVerAGE-DB: A database of COVID-19 cases and deaths by age (https://osf.io/mpwjq/)"
 WorldRobinson <- readRDS(here::here("data/NEWorldRobinson.rds"))
 geo_df <- readRDS(here::here("data/WorldRobinson_df.rds"))
+
+#
 dtJHU <- get.JHU.daily()
-dt5_ori <- download_covid(data = "Output_5", temp = TRUE, 
-                          verbose = FALSE, progress = FALSE, return = "data.table") 
-dt5 <- clean_outputDB(dt5_ori)
+dtJHU2 <- process_dtJHU(dtJHU)
+
+# `load_fresh` will save a local copy
+# dt5_ori <- load_fresh(backup = TRUE)
+dt5_ori <- fread(here::here("data_backup/dt5_ori.csv"))
+dt5 <- clean_outputDB(dt5_ori) # dt5 has only latest day 
+countries_w_new_update <- dt5[Date>"2020-10-01", unique(Country)]
+all_countries <- get_cnames(dt5) # all countries in the datasets
+# range of `max_date`
+dt_date <- unique(dt5[,.(Country, max_date)])
+  
+# make dt5_country (MPIDR by country and age and sex) for Tableau 
+dt5_country <- get_dt5_pool_sex(dt5) # dt5_country has all the countries, pooled sex into total and remove NA value
+dt5_country[, New:=ifelse(Country%in%countries_w_new_update, 1, 0)]
+dt5_country <- join_region(dt5_country) # joined to region 
+
+dt5_country <- join_wpp_pop_dth(dt5_country)
+# dt5_country[, update_date:= format.Date(dt5_ori$update_date[1], "%d %B %Y")]
+dt5_country[, update_date:= as.Date(dt5_ori$update_date[1], format = "%d %B %Y")]
+
+dt5_country_colorder <- readRDS(here::here("data/dt5_country_colorder.rds"))
+setcolorder(dt5_country, dt5_country_colorder)
+dt5_country[,.N]
+# 2/11: 8383
+# unique(dt5_country[,.(Measure, Sex2, WBRegion4, nc_MPIDR_WB)]) # Number of MPIDR countries by WB group 
+
+# agg country and age get total
+# dt5_total <- get_sum_country_age(dt5_country)
+dt5_summary_simple <- get_summary_table(dt5_country)
+dt5_summary_simple[, Pcent_0_9:= (`Age 0-4` + `Age 5-9`) / Sum0_19 * 100] # 0-10 % in 0-20
+dt5_summary_simple[, Pcent_10_19:= (`Age 10-14` + `Age 15-19`) / Sum0_19 * 100]
+
+# agg by WB region
+dt5_summary_region <- get_summary_table_region(dt5_country, dtJHU2)
+dt5_summary_region[1:6,]
+# 
+# aggregate at country level with JHU country data 
+dt5_summary <- get_summary_table_region2(dt5_country, dtJHU2)
+dt5_summary[,.N]
+# 744
+
+dt5_summary_simple
+
 ```
 
+
 ```{r}
-all_countries <- get_cnames(dt5)
-dt5_sex_1 <- pool_sex(dt5)
-dt5_sex_2 <- pool_sex(dt5, sex_specific = TRUE)
-dt5_sex <- rbindlist(list(dt5_sex_1, dt5_sex_2), use.names = TRUE)
-
-# adjust country names now:
-cnames_new <- revise_map_name(get_cnames(dt5_sex))
-dt5_sex$Country_new <- revise_map_name(dt5_sex$Country)
-# N answers for how many countries have cases/deaths
-dt5_sex[, N:= uniqueN(Country_new), by = .(Measure, Sex)] 
-
+# plots ----
 # dt_ava shows if there is only case, or only deaths or both for each country by sex
-dt_ava <- copy(dt5_sex)[, nMeasure := paste(sort(unique(Measure)), collapse = "_"), by = .(Sex, Country_new)]
+dt_ava <- copy(dt5_country)[, Measure := paste(sort(unique(Measure)), collapse = "_"), by = .(Sex, Country)]
 dt_ava[Sex!="Both", Sex:= "Sex-specific"]
-dt_ava2 <- unique(dt_ava[,.(Country_new, Sex, nMeasure)])
+dt_ava2 <- unique(dt_ava[,.(Country, Sex, Measure)]) # used for map, `plot_ava_map2`
+# dt_ava2[Sex=="Both"&grepl("Cases", Measure) ,.N]
 
 
-# summary table to print
-dtt <- get_summary_table(dt5_sex)
-dt1 <- dtt[Sex=="Total"][,Sex:=NULL]
-dt2 <- dtt[Sex!="Total"][, `COVerAGE-DB/JHU(%)`:=NULL][, JHU:=NULL]
+# latest date of updating country
+dt_date <- unique(dt5[, .(Country, Sex, Date)])
+dt_date[, Month := format(Date, "%Y-%m")]
+# There are `r NC_New` countries updated after October 2020:
+NC_New <- paste0(dt_date[Month >= "2020-10", uniqueN(Country)], " (", 
+                 round(dt_date[Month >= "2020-10", uniqueN(Country)]/dt_date[,uniqueN(Country)]*100), "%)")
 
+# agg country, get total by age
+dt5_total_age <- get_sum_country(dt5_country)
+
+# then get regional summary
+dt5_total_region <- get_sum_country_region(dt5_country) # get regional (both total and sex-specific )
+
+# plot barchart by age groups using dataset `dt5_total_age` 
+bar_total_age1 <- make_barchart2(dt5_total_age[Sex=="Both"], Measure0 = "Cases")
+bar_total_age2 <- make_barchart2(dt5_total_age[Sex=="Both"], Measure0 = "Deaths")
+bar_total_age <- cowplot::plot_grid(bar_total_age1, bar_total_age2)
+
+# plot barchart by WB region
+bar_total_age_region <- make_barchart2(dt5_total_region[Sex=="Both"], label = FALSE)
+
+
+# age pyramid for case and death 
+dt5_total_age$Sex <- factor(dt5_total_age$Sex, levels = c("Both", "Male", "Female"))
+plots_by_measure1 <- plot.measure(data = dt5_total_age[Sex!="Both"], Measure0 = "Cases", big_plot = TRUE, hide_legend = TRUE)
+plots_by_measure2 <- plot.measure(data = dt5_total_age[Sex!="Both"], Measure0 = "Deaths", big_plot = TRUE, hide_legend = FALSE)
+pyramid_age_sex <- cowplot::plot_grid(plots_by_measure1, plots_by_measure2) 
+
+# age pyramid for case and death --- by WB region
+rcs <- c("Low income",
+           "Lower middle income",
+           "Upper middle income",
+           "High income")
+grid0 <- expand.grid(rcs, c("Cases", "Deaths"))
+
+plot.all <- function(region0, measure0){
+  plot.measure(dt5_total_region[Sex!="Both"], measure0, region0, big_plot = TRUE, hide_legend = TRUE, hide_text = TRUE)
+}
+plots_by_region_sex <- Map(plot.all, region0 = grid0$Var1, measure0 = grid0$Var2)
+pyramid_age_sex_region <- cowplot::plot_grid(plotlist = plots_by_region_sex, ncol = 2)    
+
+# 
 # one map each 
-# In the `dt5_sex` dataset, countries with single/both sex always have total
-c_case <- dt5_sex[Measure=="Cases" & Sex == "Both", unique(Country_new)]
-c_death <- dt5_sex[Measure=="Deaths" & Sex == "Both", unique(Country_new)]
-c_case_sex<- dt5_sex[Measure=="Cases" & Sex != "Both", unique(Country_new)]
-c_death_sex <- dt5_sex[Measure=="Deaths" & Sex != "Both", unique(Country_new)]
-
-# map_case <- plot_ava_map(highlight_cnames = c_case)
-# map_death <- plot_ava_map(highlight_cnames = c_death)
-# map_case_sex <- plot_ava_map(highlight_cnames = c_case_sex)
-# map_death_sex <- plot_ava_map(highlight_cnames = c_death_sex)
+# In the `dt5_country` dataset, countries with single/both sex always have total
+c_case <- dt5_country[Measure=="Cases" & Sex == "Both", unique(Country)]
+c_death <- dt5_country[Measure=="Deaths" & Sex == "Both", unique(Country)]
+c_case_sex<- dt5_country[Measure=="Cases" & Sex != "Both", unique(Country)]
+c_death_sex <- dt5_country[Measure=="Deaths" & Sex != "Both", unique(Country)]
 
 map_total <- plot_ava_map2(dt_ava2[Sex == "Both"])
 map_sex_specific <- plot_ava_map2(dt_ava2[Sex == "Sex-specific"])
 
 # aggregated plots for all countries ---- 
 all_countries <- get_cnames(dt5)
-data_total1 <- rbindlist(lapply(all_countries, get_dt_for_total, 
+# `get_dt_for_total` runs a cleaning function, check if CFR could be obtained
+data_total1 <- rbindlist(lapply(all_countries, get_dt_for_total,
                                 data = dt5,
                                 target_interval = seq(0, 90, by = 5),
                                 get_f_m = FALSE))
+# for the 0-19 group total
+CFR_0_19 <- round(calculate.CFR(data_total1)[Measure=="Deaths", Value]/calculate.CFR(data_total1)[Measure=="Cases", Value] * 100, 3)
+
 data_total2 <- rbindlist(lapply(all_countries, get_dt_for_total, 
                                 data = dt5,
                                 target_interval = seq(0, 90, by = 5),
                                 get_f_m = TRUE))
 
-# a three-panel plot (Case, Death, CFR) for a specific given interval
-g1 <- plot_aggregated_total(data_total1, big_plot = TRUE)
-g2 <- plot_aggregated_total(data_total2, by_sex = TRUE, big_plot = TRUE)
-
+# CFR plot
+data_total1 <- revise.data.total(data_total1) # calculate CFR
+data_total2 <- revise.data.total(data_total2)
+CFR_total <- plot.measure(data_total1, Measure0 = "Case fatality rate", 
+                   big_plot = TRUE, hide_legend = TRUE) # total
+CFR_sex <- plot.measure(data_total2, Measure0 = "Case fatality rate", 
+                   big_plot = TRUE, hide_legend = FALSE) # sex-specific
+bar_CFR <- cowplot::plot_grid(CFR_total, CFR_sex) 
 ```
 
-**Purpose**  
-
-Population characteristics are key to understanding the prevalence, spread and fatality of COVID-19 across countries. The COVID Age Database (COVerAGE-DB) provides a valuable insight into age-and sex-specific patterns of COVID-19 cases and deaths.
-
-**Source of data**
+**This page uses the harmonized dataset with 5-year age interval. **
 
 COVerAGE-DB is an open-access database including cumulative counts of confirmed COVID-19 cases, deaths, and tests by age and sex. Original data and sources are provided alongside data and measures in standardized and age-harmonized formats. The data were extracted from reports published by official governmental institutions in a variety of formats.
 The [project page](https://github.com/timriffe/covid_age) and the [medRxiv paper](https://www.medrxiv.org/content/10.1101/2020.09.18.20197228v2) contain the technical details. 
 
-The database is still in development. Today it includes `r dt5_ori[, uniqueN(Country)]` countries and `r dt5_ori[Region!="All", uniqueN(Region)]` subnational areas.
+The database is still in development. On `r Sys.Date()` it includes `r dt5_ori[, uniqueN(Country)]` countries and `r dt5_ori[Region!="All", uniqueN(Region)]` subnational areas.
 
+**Data Availability**
 
-**Limitation**  
-
-The limitation of the COVerAGE-DB is the heterogeneous qualities of the underlying data, which is also difficult to evaluate. Case and death counts are likely underestimated, with underestimation expected to vary by age. As the definitions and practices of counting COVID-19 cases and deaths vary in each country, the data should be interpreted with caution when making comparisons across countries or within the same country over time.
-
-### Cases and deaths by age
-
-Figure 1. The `r length(c_case)` countries with national data on counts of COVID-19 cases and the `r length(c_death)` countries with national data on counts of COVID-19 deaths.
+The `r length(c_case)` countries with national data on counts of COVID-19 cases and the `r length(c_death)` countries with national data on counts of COVID-19 deaths.
+The `r length(c_case_sex)` countries with national data on sex-specific counts of COVID-19 cases and the `r length(c_death_sex)` countries with national data on sex-specific counts of COVID-19 deaths.
 
 ```{r, fig.width=8, fig.height=4}
 map_total
-```
-
-Table 1. The total cases and deaths reported by Johns Hopkins University (JHU) and extracted from the COVerAGE-DB database. The fourth column (COVerAGE-DB/JHU) shows the ratio of total case and death counts from COVerAGE-DB to those reported by JHU. The harmonized data of age groups 0-4, 5-9, 10-14, 15-19 are listed in the table. Their counts sum to age group 0-19 and the percentage values show this age group’s proportion in all age groups. 
-
-```{r}
-print_table(dt1)
-```
-
-Figure 2. Population distribution of global COVID-19 cases, deaths and case fatality rate (CFR), with 5-year age interval. CFR is calculated by dividing death counts by case counts for each age group. In calculating CFR, only countries with both case and death data are counted.
-
-```{r, fig.width=14, fig.height=6}
-g1
-```
-
-
-### Cases and deaths by age and sex
-
-Figure 3. The `r length(c_case_sex)` countries with national data on sex-specific counts of COVID-19 cases and the `r length(c_death_sex)` countries with national data on sex-specific counts of COVID-19 deaths.
-
-```{r, fig.width=8, fig.height=4}
 map_sex_specific
 ```
 
-Table 2. Sex-specific counts of COVID-19 cases and deaths from COVerAGE-DB. The harmonized data for age groups 0-4, 5-9, 10-14, 15-19 and 0-19 as well as the proportion of age group 0-19 are shown in the table.
 
-```{r}
-print_table(dt2)
+**Age distribution of global COVID-19 cases and deaths**
+```{r, fig.width=10, fig.height=4}
+
+bar_total_age
 ```
 
-Figure 4. Population distribution of COVID-19 cases, deaths and case fatality rate (CFR), by sex and age (5-year age interval). In calculating CFR, only countries with both case and death data are counted.
-
-```{r, fig.width=14, fig.height=6}
-g2
+**Age distribution of global COVID-19 cases and deaths by sex**
+```{r, fig.width=10, fig.height=4}
+pyramid_age_sex
 ```
 
+**Case fatality rate (CFR), with 5-year age interval. **
+CFR is calculated by dividing death counts by case counts for each age group. In calculating CFR, only countries with both case and death data are counted.
+
+```{r, fig.width=10, fig.height=4}
+bar_CFR
+```
+
+**Age distribution of COVID-19 cases and deaths by income group**
+```{r, fig.width=10, fig.height=10}
+bar_total_age_region
+```
+
+**Age distribution of global COVID-19 cases and deaths by sex and income group**
+```{r, fig.width=10, fig.height=14}
+pyramid_age_sex_region
+```
+ 
 
 ## Reference  
 

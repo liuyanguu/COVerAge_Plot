@@ -1,0 +1,113 @@
+---
+title: "Cases and deaths from JHU and MPIDR datasets"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message=FALSE, fig.width=8, fig.height=6)
+```
+ 
+```{r}
+cname0 = "Pakistan"
+
+suppressPackageStartupMessages({
+  library("data.table")
+  library("ggplot2")
+  library("readr")
+  library("cowplot")
+  library("osfr")
+  library("kableExtra")
+})
+invisible(lapply(list.files(here::here("R"), full.names = TRUE), source))
+
+# download input.DB as zip file and read in 
+dt5_ori <- download_covid(data = "Output_5", temp = TRUE,
+                          verbose = FALSE, progress = FALSE, return = "data.table")
+dt5_ori <- fread("data_backup/dt5_ori.csv")
+# dt5 <- clean_outputDB(dt5_ori)
+
+# 
+# country-specific JHU time series
+dtJHU_country <- get.JHU.ts(cname = c(cname0))
+p1_JHU_P <- plot_country_JHU(dtJHU =dtJHU_country, cname =  cname0)
+
+#
+# summary tables 
+dtJHU <- get.JHU.daily()
+dtJHU2 <- process_dtJHU(dtJHU)
+
+all_countries <- get_cnames(dt5) # all countries
+dt5_country <- get_dt5_pool_sex(dt5) # dt5_country has all the countries, pooled sex into total and remove NA value
+dt5_country <- join_region(dt5_country) # joined to region 
+# dt5_summary_simple <- get_summary_table(dt5_country)
+dt5_summary <- get_summary_table_region2(dt5_country, dtJHU2, combine_sex = FALSE)
+
+dtt <- dt5_summary[Country == cname0]
+if(nrow(dtt)==0) stop("Is the country name correct, use official country name.")
+# show: 
+dtt[, Pcnt0_19 := round(Pcnt0_19*100, 1)]
+setnames(dtt, "MPIDR_JHU", "COVerAGE-DB/JHU(%)")
+dtt[Measure == "Cases", `Age 0-19` := paste0(prettyNum(Sum0_19, big.mark = ","),
+                                                    " (", round(Pcnt0_19), "%)")] # round to .
+dtt[Measure == "Deaths", `Age 0-19` := paste0(prettyNum(Sum0_19, big.mark = ","),
+                                                     " (", Pcnt0_19, "%)")]
+dt1_total <- dtt[Sex=="Both"][,.(Country, Measure,JHU, `COVerAGE-DB/JHU(%)`, `Age 0-4`, `Age 5-9`, `Age 10-14`,
+                                              `Age 15-19`, `Age 0-19`)]
+dt2_by_sex <- dtt[Sex=="Both"][,.(Country, Measure, Sex, `COVerAGE-DB/JHU(%)`, `Age 0-4`, `Age 5-9`, `Age 10-14`,
+                                              `Age 15-19`, `Age 0-19`)]
+
+
+
+# country-specific age-pyramid ---- 
+p2_P <- make_country_plot(cname0, dt1 = dt5)
+
+```
+
+
+## Source of data
+
+Johns Hopkins University (JHU) data refer to the daily-updated data used for their dashboard. The dataset was downloaded from the [project page](https://github.com/CSSEGISandData/COVID-19).
+
+COVerAGE-DB, led by the Max Planck Institute, is an open-access database including cumulative counts of confirmed COVID-19 cases, deaths, and tests by age and sex. Original data and sources are provided alongside data and measures in standardized and age-harmonized formats. The data were extracted from reports published by official governmental institutions in a variety of formats. The [project page](https://github.com/timriffe/covid_age) and the [medRxiv paper](https://www.medrxiv.org/content/10.1101/2020.09.18.20197228v2) contain the technical details. The database is still in development. Today it includes `r dt5_ori[, uniqueN(Country)]` countries and `r dt5_ori[Region!="All", uniqueN(Region)]` subnational areas.
+
+
+## Pakistan
+
+### Data from Johns Hopkins University
+**Last updated on `r dtJHU[Country_Region == cname0, Last_Update][1]`**
+
+Figure 1. Daily cases and deaths from Johns Hopkins University  
+
+```{r, fig.width = 8, fig.height = 6}
+(p1_JHU_P)
+```
+
+
+### Data from COVerAGE-DB
+**The COVerAGE-DB dataset for Pakistan was most recently updated on 2020-05-31**
+
+Table 1.a. The cases and deaths reported by Johns Hopkins University (JHU) and extracted from the COVerAGE-DB database. The fourth column (COVerAGE-DB/JHU) shows the ratio of case and death counts from COVerAGE-DB to those reported by JHU. The harmonized data of age groups 0-4, 5-9, 10-14, 15-19 are listed in the table. Their counts sum to age group 0-19 and the percentage values show this age group’s proportion in all age groups. 
+
+```{r}
+print_table_pdf(dt1_total)
+```
+
+Table 1.b. Counts of COVID-19 cases and deaths by sex from COVerAGE-DB. The harmonized data for age groups 0-4, 5-9, 10-14, 15-19 and 0-19 as well as the proportion of age group 0-19 are shown in the table. 
+```{r}
+print_table_pdf(dt2_by_sex)
+```
+
+
+Figure 2. Age distribution of COVID-19 cases, deaths and case fatality rate (CFR), with 5-year age interval. CFR is calculated by dividing death counts by case counts for each age group.
+
+```{r, fig.width=14, fig.height=6}
+p2_P
+```
+
+
+
+## Reference  
+
+Dong E, Du H, Gardner L. An interactive web-based dashboard to track COVID-19 in real time. Lancet Inf Dis. 20(5):533-534. https://doi.org/10.1016/S1473-3099(20)30120-1
+
+Riffe, T., Acosta, E., and The COVerAGE-DB team (2020). COVerAGE-DB: A database of COVID-19 cases and deaths by age. medRxiv https://doi.org/10.1101/2020.09.18.20197228

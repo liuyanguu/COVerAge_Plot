@@ -57,8 +57,6 @@ refresh_data <- function(save_locally = FALSE){
 }
 
 
-
-
 # 2. Dataset preparation ----------------------------------------------------
 
 #' rough cleaning inputDB
@@ -92,14 +90,15 @@ clean_inputDB <- function(inputDB){
   return(dt1)
 }
 
-clean_outputDB <- function(outputDB){
+clean_outputDB <- function(
+  outputDB = dt5_ori
+  ){
+  outputDB <- copy(outputDB)
   outputDB[, Tests:=NULL]
   outputDB <- outputDB[Region=="All"]
   
-  # latest date by Measure, Country, Sex
-  outputDB[, max_date:= max(Date), by = .(Country, Sex)]
-  outputDB <- outputDB[Date==max_date]
-  outputDB[, max_date:=NULL]
+  outputDB[, Date:= as.Date(Date, format = "%d.%m.%Y")]
+  
   outputDB$Sex <- as.factor(outputDB$Sex)
   levels(outputDB$Sex) <- c("Both", "Female", "Male")
   
@@ -107,6 +106,22 @@ clean_outputDB <- function(outputDB){
                               variable.name = "Measure", value.name = "Value",
                               variable.factor = FALSE)
   outputDB[, Value:=round(Value)] # since the calculated count could have decimal
+  
+  # filter latest day 
+  # clean up na values to get correct by Date
+  outputDB <- outputDB[!is.na(Value) & Value!=0]
+  outputDB[, max_date:= max(Date), by = .(Country, Sex, Measure)]
+  outputDB <- outputDB[Date==max_date]
+  # outputDB[, max_date:=NULL]
+  
+  return(outputDB)
+}
+
+get_latest_date <- function(outputDB){
+  # latest date by Measure, Country, Sex
+  outputDB[, max_date:= max(Date), by = .(Country, Sex)]
+  outputDB <- outputDB[Date==max_date]
+  outputDB[, max_date:=NULL]
   return(outputDB)
 }
 
@@ -114,7 +129,6 @@ clean_outputDB <- function(outputDB){
 #' get all country names, remove some regions if needed 
 get_cnames <- function(dt1){
   cnames <- sort(unique(dt1$Country))
-  cnames <- cnames[!cnames%in%c("Taiwan")]
   return(cnames)
 }
 
@@ -129,13 +143,18 @@ get_cnames <- function(dt1){
 #' @param Measure0
 #' @param big_plot is this a group plot for all countries or just showing one,
 #'   if TRUE, font will be larger, if FALSE, font will be smaller
+#' @param Region0 
+#' @param hide_legend 
 #'   
 plot.measure <- function(data, 
                          Measure0, 
+                         Region0 = NULL, # allow further subset by region
                          big_plot = FALSE,
-                         hide_legend = FALSE){
+                         hide_legend = FALSE,
+                         hide_text = FALSE){
   
   data_sex <- copy(data[Measure==Measure0])
+  if(!is.null(Region0) & "Region"%in%colnames(data)) data_sex <- data_sex[Region == Region0]
   levels0 <- unique(sort(data_sex$Age))
   n_levels <- length(levels0)
   data_sex$Age <- factor(data_sex$Age, levels = levels0) # levels adjusted in order
@@ -158,14 +177,14 @@ plot.measure <- function(data,
            label_position := ifelse(Sex == "Male", 
                                     -Value - max_value*0.15,
                                      Value + max_value*0.15)]  
-  # revise axis
+  # revise axis label
   scientific_10 <- function(x) {
-    parse(text=gsub("e", " %*%10^", scales::scientific_format()(x)))
-    # scales::scientific_format()(x)
+    # parse(text=gsub("e", " %*%10^", scales::scientific_format()(x)))
+    scales::comma_format()(x)
   }
   scientific_10_abs <- function(x) {
-    parse(text=gsub("e", " %*%10^", scales::scientific_format()(abs(x))))
-    # scales::scientific_format()(abs(x))
+    # parse(text=gsub("e", " %*%10^", scales::scientific_format()(abs(x))))
+    scales::comma_format()(abs(x))
   }
   
   # plot
@@ -173,7 +192,7 @@ plot.measure <- function(data,
               mapping = aes(x = ifelse(Sex == "Male", yes = -Value, no = Value), 
                             y = Age, fill = Sex, 
                             # label = if(max_value<1E5) prettyNum(Value,big.mark = ",") else formatC(Value, format = "e", digits = 2, width = 1)
-                            label = prettyNum(Value,big.mark = ",")
+                            label = prettyNum(Value, big.mark = ",")
                             )) +
     geom_col(width = 0.8) +
     # ggrepel::geom_text_repel(seed = 123,
@@ -184,22 +203,22 @@ plot.measure <- function(data,
     #                          force_pull = 2, force = 1,
     #                          segment.size = 0.2, segment.color = "grey"
     # ) +
-    geom_text(aes(x = label_position), size = if(ngroup>10 & !big_plot) 1.5 else 2.5, 
-              hjust = 0.5
-    )+
-    labs(x = "", y ="", fill = "", 
-         subtitle = paste(Measure0))  + 
+
+    labs(x = "",  fill = "", 
+         title = if(!is.null(Region0) & "Region"%in%colnames(data)) paste0(Measure0, ": ", Region0))  + 
     theme_minimal() + 
     theme(axis.text.x = element_text(size=ifelse(max_value>1E4 & !big_plot, 6, 8)),
           panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank(),
           axis.line.x = element_line(colour = "black"))
-  # g
+  
+  if(!hide_text) g <- g + geom_text(aes(x = label_position), size = if(ngroup>10 & !big_plot) 1.5 else 2.5, 
+                                        hjust = 0.5)
   # If it is a sex plot --- add color 
   avail_sex <- unique(data_sex$Sex)
   if(any(grepl("Female|Male", avail_sex))){
     g <- g+
-      scale_fill_manual(values = c("Female" = "pink2", "Male" = "skyblue"))
+      scale_fill_manual(values = c("Male" = "#1CABE2", "Female" = "#F26A21"))
   }
 
   
@@ -224,6 +243,7 @@ plot.measure <- function(data,
   if(hide_legend) g <- g + theme(legend.position = "none")
   return(g)
 } 
+
 
 # Calculate CFR --- Case Fatality Rate ---- 
 get.data.CFR <- function(data_both, Exact_Match = FALSE){
@@ -286,17 +306,17 @@ make_country_plot <- function(
   latest.date <- max(dt2$Date, na.rm = TRUE)
   avail_mea <- sort(unique(dt2[Value!=0, Measure]))
   if(length(avail_mea)==0) {
-    cat(cname0, "-Measures-", "All values are 0, not plotted", "\n")
+    message(cname0, "-Measures-", "All values are 0, not plotted", "\n")
     return(NULL)
   }
-  cat(cname0, "-Measures-", paste(avail_mea, collapse = ", "), "\n")
+  message(cname0, "-Measures-", paste(avail_mea, collapse = ", "), "\n")
   # get datasets by measure
   get.dt.measure <- function(Measure0){
     # data_measure <- dt2[Measure=="Cases"]
     data_measure <- dt2[Measure==Measure0]
     data_measure <- data_measure[!is.na(Value)] # as in outputDB, have all sex, but value could be NA
     avail_sex <- unique(data_measure$Sex)  
-    cat(cname0, Measure0, "-Sexes-", paste(avail_sex, collapse = ", "), "\n")
+    message(cname0, Measure0, "-Sexes-", paste(avail_sex, collapse = ", "), "\n")
     if(any(grepl("Female|Male", avail_sex))) {
       data_sex <- data_measure[Sex%in%c("Female", "Male")]
     } else {
@@ -304,6 +324,7 @@ make_country_plot <- function(
     }
     
     suppressWarnings(data_sex[, Age := as.numeric(Age)])
+    suppressWarnings(data_sex[, AgeInt  := as.numeric(AgeInt )])
     data_sex[Age>95, Age:=95]
     
     if(median(data_sex$AgeInt, na.rm = TRUE)<2){
@@ -452,7 +473,31 @@ get_dt_for_total <- function(
   return(data_sex2)
 }
 
-# revise the total dataset 
+# factor and rename Measure into full names
+factor.Measure <- function(data_total, target_level = c("Cases", "Deaths", "CFR")){
+  match_name <- list(
+    "Cases"  =  "Reported COVID-19 cases",
+    "Deaths" =  "Reported COVID-19 deaths",
+    "CFR"    =  "Case fatality rate"
+  )
+  data_total$Measure <- as.factor(data_total$Measure)
+  data_total$Measure <- factor(data_total$Measure, levels = target_level)
+  levels(data_total$Measure) <- c(get.match(target_level, new_list = match_name))
+  data_total
+}
+
+factor.sex <- function(data_total, target_level = c("Both", "Male", "Female")){
+  match_name <- list(
+    "Both"  =  "Total"
+  )
+  data_total$Sex <- as.factor(data_total$Sex)
+  data_total$Sex <- factor(data_total$Sex, levels = target_level)
+  levels(data_total$Sex) <- c(get.match(target_level, new_list = match_name))
+  
+  data_total
+}
+
+# revise the total dataset, sum countries, calculate CFR
 revise.data.total <- function(data_total){
   n_country <- uniqueN(data_total$Country)
   # data_total <- copy(data[Age!="Unknown"])
@@ -461,20 +506,35 @@ revise.data.total <- function(data_total){
   data_CFR <- get.data.CFR(data_total)
   data_total <- rbindlist(list(data_total, data_CFR), use.names = TRUE)
   data_total[, n_country:= n_country]
+  data_total <- factor.Measure(data_total)
+  avail_sex <- unique(data_total$Sex)
+  if(any(grepl("Female|Male", avail_sex))){
+    data_total$Sex <- as.factor(data_total$Sex)
+    data_total$Sex <- factor(data_total$Sex, levels = c("Male", "Female"))
+  }
   return(data_total)
+}
+
+calculate.CFR <- function(data_total, age_groups = c(0,5,10,15)){
+  data_total <- copy(data_total)[Age%in%age_groups]
+  data_total[, Value:= sum(Value), by = .(Measure, Sex)]
+  data_total <- unique(data_total[,.(Measure, Sex, Value)])
+  data_total
 }
 
 plot_aggregated_total <- function(data_total, by_sex = FALSE, big_plot = FALSE){
   # further aggregated by country 
-  data_total <- revise.data.total(data_total)
+  data_total <- revise.data.total(data_total1)
+    # titles, etc
   total_title <- paste0("Aggregated results of ", data_total$n_country[1], " countries")
   total_title <- paste(total_title, if(by_sex) "by sex")
   title <- cowplot::ggdraw() + 
     draw_label(total_title, fontface = 'bold', x = 0, hjust = 0) + 
     theme(plot.margin = margin(0, 0, 0, 7))
-  plots_by_measure <- lapply(c("Cases", "Deaths"), plot.measure, data = data_total,
+  measures <- unique(data_total$Measure)
+  plots_by_measure <- lapply(measures[1:2], plot.measure, data = data_total,
                              big_plot = big_plot, hide_legend = TRUE)
-  plots_by_measure[[3]] <- plot.measure(data = data_total, Measure0 = "CFR",
+  plots_by_measure[[3]] <- plot.measure(data = data_total, Measure0 = measures[3],
                                         big_plot = big_plot, hide_legend = if(by_sex) FALSE else TRUE)
   gg <- cowplot::plot_grid(plotlist = plots_by_measure, nrow = 1)    
   gg <- cowplot::plot_grid(title, gg, ncol = 1,

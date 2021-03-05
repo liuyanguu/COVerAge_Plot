@@ -1,0 +1,191 @@
+Country,Sex,Measure
+Afghanistan,Both,Cases_Deaths
+Afghanistan,Sex-specific,Deaths
+Albania,Both,Cases_Deaths
+Algeria,Both,Cases
+Angola,Both,Cases
+Angola,Sex-specific,Cases
+Argentina,Both,Cases_Deaths
+Argentina,Sex-specific,Cases_Deaths
+Australia,Both,Cases_Deaths
+Australia,Sex-specific,Cases_Deaths
+Austria,Both,Cases_Deaths
+Austria,Sex-specific,Cases_Deaths
+Bangladesh,Both,Cases_Deaths
+Belgium,Both,Cases_Deaths
+Belgium,Sex-specific,Cases_Deaths
+Bolivia,Both,Cases_Deaths
+Bolivia,Sex-specific,Cases_Deaths
+Botswana,Both,Cases_Deaths
+Brazil,Both,Deaths
+Brazil,Sex-specific,Deaths
+Bulgaria,Both,Cases_Deaths
+Bulgaria,Sex-specific,Cases_Deaths
+Burkina Faso,Both,Cases_Deaths
+Burkina Faso,Sex-specific,Cases
+Burundi,Both,Cases
+Burundi,Sex-specific,Cases
+Cameroon,Both,Cases_Deaths
+Cameroon,Sex-specific,Cases_Deaths
+Canada,Both,Cases_Deaths
+Canada,Sex-specific,Cases
+Central African Republic,Both,Cases
+Central African Republic,Sex-specific,Cases
+Chad,Both,Cases_Deaths
+Chad,Sex-specific,Cases_Deaths
+Chile,Both,Deaths
+Chile,Sex-specific,Deaths
+China,Both,Cases_Deaths
+China,Sex-specific,Cases_Deaths
+Colombia,Both,Cases_Deaths
+Colombia,Sex-specific,Cases_Deaths
+Costa Rica,Both,Cases_Deaths
+Croatia,Both,Cases_Deaths
+Croatia,Sex-specific,Cases_Deaths
+Cuba,Both,Deaths
+Cuba,Sex-specific,Deaths
+Cyprus,Both,Cases_Deaths
+Cyprus,Sex-specific,Cases_Deaths
+Czech Republic,Both,Cases_Deaths
+Czech Republic,Sex-specific,Cases_Deaths
+Denmark,Both,Cases_Deaths
+Denmark,Sex-specific,Cases
+Dominican Republic,Both,Cases_Deaths
+Dominican Republic,Sex-specific,Cases_Deaths
+Ecuador,Both,Cases_Deaths
+Ecuador,Sex-specific,Cases_Deaths
+El Salvador,Both,Cases_Deaths
+El Salvador,Sex-specific,Deaths
+Equatorial Guinea,Both,Cases
+Equatorial Guinea,Sex-specific,Cases
+Estonia,Both,Cases
+Estonia,Sex-specific,Cases
+Ethiopia,Both,Cases_Deaths
+Ethiopia,Sex-specific,Cases_Deaths
+Finland,Both,Cases_Deaths
+Finland,Sex-specific,Cases_Deaths
+France,Both,Deaths
+France,Sex-specific,Deaths
+Gambia The,Both,Cases
+Gambia The,Sex-specific,Cases
+Germany,Both,Cases_Deaths
+Germany,Sex-specific,Cases_Deaths
+Greece,Both,Cases_Deaths
+Greece,Sex-specific,Cases_Deaths
+Guatemala,Both,Cases
+Haiti,Both,Cases_Deaths
+Honduras,Both,Cases
+Hungary,Both,Cases_Deaths
+Hungary,Sex-specific,Cases_Deaths
+Iceland,Both,Cases_Deaths
+Iceland,Sex-specific,Cases_Deaths
+India,Both,Cases_Deaths
+India,Sex-specific,Cases_Deaths
+Indonesia,Both,Cases_Deaths
+Iraq,Both,Cases_Deaths
+Iraq,Sex-specific,Cases_Deaths
+Ireland,Both,Cases_Deaths
+Ireland,Sex-specific,Cases_Deaths
+Israel,Both,Cases
+Israel,Sex-specific,Cases
+Italy,Both,Cases_Deaths
+Italy,Sex-specific,Cases_Deaths
+Jamaica,Both,Cases_Deaths
+Japan,Both,Cases_Deaths
+Japan,Sex-specific,Cases_Deaths
+Jordan,Both,Cases_Deaths
+Jordan,Sex-specific,Cases_Deaths
+Kazakhstan,Both,Cases
+Kazakhstan,Sex-specific,Cases
+Kenya,Both,Cases_Deaths
+Kenya,Sex-specific,Cases_Deaths
+Korea Rep,Both,Cases_Deaths
+Korea Rep,Sex-specific,Cases_Deaths
+Kyrgyzstan,Both,Cases
+Latvia,Both,Cases_Deaths
+Latvia,Sex-specific,Cases_Deaths
+Lebanon,Both,Cases
+Lithuania,Both,Cases_Deaths
+Lithuania,Sex-specific,Cases_Deaths
+Luxembourg,Both,Cases_Deaths
+Luxembourg,Sex-specific,Cases_Deaths
+Malawi,Both,Cases_Deaths
+Malawi,Sex-specific,Cases_Deaths
+Mali,Both,Cases
+Mali,Sex-specific,Cases
+Malta,Both,Cases_Deaths
+Malta,Sex-specific,Cases_Deaths
+Mauritania,Both,Cases
+Mauritania,Sex-specific,Cases
+Mexico,Both,Cases_Deaths
+Mexico,Sex-specific,Cases_Deaths
+Moldova,Both,Cases_Deaths
+Moldova,Sex-specific,Cases_Deaths
+Mozambique,Both,Cases
+Mozambique,Sex-specific,Cases
+Namibia,Both,Cases
+Namibia,Sex-specific,Cases
+Nepal,Both,Cases_Deaths
+Nepal,Sex-specific,Deaths
+Netherlands,Both,Cases
+Netherlands,Sex-specific,Cases
+New Zealand,Both,Deaths
+Nigeria,Both,Cases_Deaths
+Nigeria,Sex-specific,Cases_Deaths
+Norway,Both,Cases
+Norway,Sex-specific,Cases
+Pakistan,Both,Cases_Deaths
+Pakistan,Sex-specific,Cases_Deaths
+Panama,Both,Deaths
+Panama,Sex-specific,Deaths
+Paraguay,Both,Cases_Deaths
+Paraguay,Sex-specific,Cases_Deaths
+Peru,Both,Cases_Deaths
+Peru,Sex-specific,Cases_Deaths
+Philippines,Both,Cases_Deaths
+Philippines,Sex-specific,Cases_Deaths
+Poland,Both,Cases_Deaths
+Poland,Sex-specific,Cases_Deaths
+Portugal,Both,Cases_Deaths
+Portugal,Sex-specific,Cases_Deaths
+Romania,Both,Cases_Deaths
+Romania,Sex-specific,Deaths
+Rwanda,Both,Cases
+Senegal,Both,Cases
+Senegal,Sex-specific,Cases
+Sierra Leone,Both,Cases_Deaths
+Sierra Leone,Sex-specific,Cases
+Slovakia,Both,Cases_Deaths
+Slovakia,Sex-specific,Cases_Deaths
+Slovenia,Both,Cases_Deaths
+Slovenia,Sex-specific,Cases_Deaths
+South Africa,Both,Cases
+South Africa,Sex-specific,Cases
+Spain,Both,Cases_Deaths
+Spain,Sex-specific,Cases_Deaths
+State of Palestine,Both,Cases
+Suriname,Both,Deaths
+Swaziland,Both,Cases_Deaths
+Swaziland,Sex-specific,Cases_Deaths
+Sweden,Both,Cases_Deaths
+Sweden,Sex-specific,Cases_Deaths
+Switzerland,Both,Cases_Deaths
+Switzerland,Sex-specific,Cases_Deaths
+Thailand,Both,Cases
+Thailand,Sex-specific,Cases
+Togo,Both,Cases_Deaths
+Togo,Sex-specific,Cases_Deaths
+Turkey,Both,Cases_Deaths
+Turkey,Sex-specific,Deaths
+Uganda,Both,Cases_Deaths
+Uganda,Sex-specific,Cases_Deaths
+Ukraine,Both,Cases_Deaths
+Ukraine,Sex-specific,Cases_Deaths
+United Kingdom,Both,Cases_Deaths
+United Kingdom,Sex-specific,Cases_Deaths
+United States of America,Both,Deaths
+United States of America,Sex-specific,Deaths
+Uruguay,Both,Cases_Deaths
+Uruguay,Sex-specific,Cases_Deaths
+Venezuela,Both,Cases
+Zambia,Both,Cases

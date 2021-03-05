@@ -11,7 +11,7 @@
 
 
 
-<title>Visualize the output dataset for COVerAGE-DB</title>
+<title>Cases and deaths from JHU and MPIDR datasets</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -24,6 +24,8 @@
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
 <script src="site_libs/anchor-sections-1.0/anchor-sections.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -300,27 +302,223 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Visualize the output dataset for COVerAGE-DB</h1>
+<h1 class="title toc-ignore">Cases and deaths from JHU and MPIDR datasets</h1>
 
 </div>
 
 
-<p><strong>This page uses the harmonized dataset with 5-year age interval. </strong></p>
-<p>COVerAGE-DB is an open-access database including cumulative counts of confirmed COVID-19 cases, deaths, and tests by age and sex. Original data and sources are provided alongside data and measures in standardized and age-harmonized formats. The data were extracted from reports published by official governmental institutions in a variety of formats. The <a href="https://github.com/timriffe/covid_age">project page</a> and the <a href="https://www.medrxiv.org/content/10.1101/2020.09.18.20197228v2">medRxiv paper</a> contain the technical details.</p>
-<p>The database is still in development. On 2021-03-05 it includes 120 countries and 370 subnational areas.</p>
-<p><strong>Data Availability</strong></p>
-<p>The 107 countries with national data on counts of COVID-19 cases and the 85 countries with national data on counts of COVID-19 deaths. The 79 countries with national data on sex-specific counts of COVID-19 cases and the 67 countries with national data on sex-specific counts of COVID-19 deaths.</p>
-<p><img src="index_files/figure-html/unnamed-chunk-3-1.png" width="768" /><img src="index_files/figure-html/unnamed-chunk-3-2.png" width="768" /></p>
-<p><strong>Age distribution of global COVID-19 cases and deaths</strong> <img src="index_files/figure-html/unnamed-chunk-4-1.png" width="960" /></p>
-<p><strong>Age distribution of global COVID-19 cases and deaths by sex</strong> <img src="index_files/figure-html/unnamed-chunk-5-1.png" width="960" /></p>
-<p><strong>Case fatality rate (CFR), with 5-year age interval. </strong> CFR is calculated by dividing death counts by case counts for each age group. In calculating CFR, only countries with both case and death data are counted.</p>
-<p><img src="index_files/figure-html/unnamed-chunk-6-1.png" width="960" /></p>
-<p><strong>Age distribution of COVID-19 cases and deaths by income group</strong> <img src="index_files/figure-html/unnamed-chunk-7-1.png" width="960" /></p>
-<p><strong>Age distribution of global COVID-19 cases and deaths by sex and income group</strong> <img src="index_files/figure-html/unnamed-chunk-8-1.png" width="960" /></p>
+<div id="source-of-data" class="section level2">
+<h2>Source of data</h2>
+<p>Johns Hopkins University (JHU) data refer to the daily-updated data used for their dashboard. The dataset was downloaded from the <a href="https://github.com/CSSEGISandData/COVID-19">project page</a>.</p>
+<p>COVerAGE-DB, led by the Max Planck Institute, is an open-access database including cumulative counts of confirmed COVID-19 cases, deaths, and tests by age and sex. Original data and sources are provided alongside data and measures in standardized and age-harmonized formats. The data were extracted from reports published by official governmental institutions in a variety of formats. The <a href="https://github.com/timriffe/covid_age">project page</a> and the <a href="https://www.medrxiv.org/content/10.1101/2020.09.18.20197228v2">medRxiv paper</a> contain the technical details. The database is still in development. Today it includes 120 countries and 370 subnational areas.</p>
+</div>
+<div id="pakistan" class="section level2">
+<h2>Pakistan</h2>
+<div id="data-from-johns-hopkins-university" class="section level3">
+<h3>Data from Johns Hopkins University</h3>
+<p><strong>Last updated on 2021-03-04 05:24:24</strong></p>
+<p>Figure 1. Daily cases and deaths from Johns Hopkins University</p>
+<p><img src="country_report_files/figure-html/unnamed-chunk-2-1.png" width="768" /></p>
+</div>
+<div id="data-from-coverage-db" class="section level3">
+<h3>Data from COVerAGE-DB</h3>
+<p><strong>The COVerAGE-DB dataset for Pakistan was most recently updated on 2020-05-31</strong></p>
+<p>Table 1.a. The cases and deaths reported by Johns Hopkins University (JHU) and extracted from the COVerAGE-DB database. The fourth column (COVerAGE-DB/JHU) shows the ratio of case and death counts from COVerAGE-DB to those reported by JHU. The harmonized data of age groups 0-4, 5-9, 10-14, 15-19 are listed in the table. Their counts sum to age group 0-19 and the percentage values show this age group’s proportion in all age groups.</p>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Country
+</th>
+<th style="text-align:left;">
+Measure
+</th>
+<th style="text-align:right;">
+JHU
+</th>
+<th style="text-align:right;">
+COVerAGE-DB/JHU(%)
+</th>
+<th style="text-align:right;">
+Age 0-4
+</th>
+<th style="text-align:right;">
+Age 5-9
+</th>
+<th style="text-align:right;">
+Age 10-14
+</th>
+<th style="text-align:right;">
+Age 15-19
+</th>
+<th style="text-align:left;">
+Age 0-19
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Pakistan
+</td>
+<td style="text-align:left;">
+Cases
+</td>
+<td style="text-align:right;">
+585435
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+741
+</td>
+<td style="text-align:right;">
+5502
+</td>
+<td style="text-align:left;">
+6,243 (8%)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pakistan
+</td>
+<td style="text-align:left;">
+Deaths
+</td>
+<td style="text-align:right;">
+13076
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+13 (0.8%)
+</td>
+</tr>
+</tbody>
+</table>
+Table 1.b. Counts of COVID-19 cases and deaths by sex from COVerAGE-DB. The harmonized data for age groups 0-4, 5-9, 10-14, 15-19 and 0-19 as well as the proportion of age group 0-19 are shown in the table.
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Country
+</th>
+<th style="text-align:left;">
+Measure
+</th>
+<th style="text-align:left;">
+Sex
+</th>
+<th style="text-align:right;">
+COVerAGE-DB/JHU(%)
+</th>
+<th style="text-align:right;">
+Age 0-4
+</th>
+<th style="text-align:right;">
+Age 5-9
+</th>
+<th style="text-align:right;">
+Age 10-14
+</th>
+<th style="text-align:right;">
+Age 15-19
+</th>
+<th style="text-align:left;">
+Age 0-19
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Pakistan
+</td>
+<td style="text-align:left;">
+Cases
+</td>
+<td style="text-align:left;">
+Both
+</td>
+<td style="text-align:right;">
+14
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+741
+</td>
+<td style="text-align:right;">
+5502
+</td>
+<td style="text-align:left;">
+6,243 (8%)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pakistan
+</td>
+<td style="text-align:left;">
+Deaths
+</td>
+<td style="text-align:left;">
+Both
+</td>
+<td style="text-align:right;">
+13
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:left;">
+13 (0.8%)
+</td>
+</tr>
+</tbody>
+</table>
+<p>Figure 2. Age distribution of COVID-19 cases, deaths and case fatality rate (CFR), with 5-year age interval. CFR is calculated by dividing death counts by case counts for each age group.</p>
+<p><img src="country_report_files/figure-html/unnamed-chunk-5-1.png" width="1344" /></p>
+</div>
+</div>
 <div id="reference" class="section level2">
 <h2>Reference</h2>
-<p>Riffe, T., Acosta, E., and The COVerAGE-DB team (2020). COVerAGE-DB: A database of COVID-19 cases and deaths by age. medRxiv <a href="https://doi.org/10.1101/2020.09.18.20197228" class="uri">https://doi.org/10.1101/2020.09.18.20197228</a></p>
 <p>Dong E, Du H, Gardner L. An interactive web-based dashboard to track COVID-19 in real time. Lancet Inf Dis. 20(5):533-534. <a href="https://doi.org/10.1016/S1473-3099(20)30120-1" class="uri">https://doi.org/10.1016/S1473-3099(20)30120-1</a></p>
+<p>Riffe, T., Acosta, E., and The COVerAGE-DB team (2020). COVerAGE-DB: A database of COVID-19 cases and deaths by age. medRxiv <a href="https://doi.org/10.1101/2020.09.18.20197228" class="uri">https://doi.org/10.1101/2020.09.18.20197228</a></p>
 </div>
 
 
