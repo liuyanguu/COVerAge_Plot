@@ -5,7 +5,9 @@
 - [Country-specific plot](https://github.com/liuyanguu/COVerAge_Plot/blob/master/README.md#country-specific-plot)
 - [Aggregated plots for all countries](https://github.com/liuyanguu/COVerAge_Plot/blob/master/README.md#aggregated-plots-for-all-countries)
 
-The `main_script.R` walks through the process to make all the plots below (updated on 2021-01-04)
+The [Github page](https://liuyanguu.github.io/COVerAge_Plot/index.html) shows the plots based on harmonized datasets from COVerAGE-DB (updated on 2021-03-05)  
+
+The `plot_raw.R` walks through the process to make all the plots below based on raw datasets from COVerAGE-DB (updated on 2021-01-04)
 
 ## Download raw data from OSF: https://osf.io/mpwjq/
 ```{r}
