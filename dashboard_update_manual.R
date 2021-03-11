@@ -69,3 +69,12 @@ googlesheets4::sheet_write(dt5_country, ss = ss2, sheet = "Sheet1")
 dir_dropbox_output <- file.path(Sys.getenv("USERPROFILE"), "Dropbox/UNICEF Work/COVID-19/COVerAge-DB-Plot")
 fwrite(dt5_summary, file.path(dir_dropbox_output, "output/MPIDR_dt5_country_summary.csv"))
 fwrite(dt5_country, file.path(dir_dropbox_output, "output/MPIDR_dt5_country.csv"))
+
+
+
+# Schedule ----------------------------------------------------------------
+
+tasks <- taskscheduleR::taskscheduler_ls()
+# check that `Next Run Time` is the time you want the task to run 
+tasks[tasks$TaskName=="dashboard_update_ScheduleR.R",]
+tasks[tasks$TaskName=="dashboard_update_ScheduleR_dup.R",]
