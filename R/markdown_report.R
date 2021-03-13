@@ -219,6 +219,29 @@ get_summary_table_region2 <- function(dt5_country, dtJHU2, combine_sex = TRUE){
   return(dt_sum_w[!is.na(Measure)])
 }
 
+# compare with the last dataset (country summary )
+get_dt5_summary_compare <- function(dt5_summary, dt5_country){
+  dt5_summary_old <- fread(get_dir_latest_file("data_backup", "dt5_summary"))[,.(ISO3Code, Measure, Sex, `COVerAGE-DB`, JHU)]
+  date_old <- gsub("dt5_summary_|.csv", "", get_dir_latest_file("data_backup", "dt5_summary", short = TRUE))
+  date_old <- as.Date(date_old)
+  setkey(dt5_summary_old, ISO3Code, Measure, Sex)
+  setnames(dt5_summary_old, c("COVerAGE-DB", "JHU"), paste0(c("COVerAGE-DB", "JHU"), "old"))
+  setkey(dt5_summary, ISO3Code, Measure, Sex)
+  setkey(dt5_summary_old, ISO3Code, Measure, Sex)
+  dt_compare <- dt5_summary[,.(ISO3Code, Country, Measure, Sex, `COVerAGE-DB`, JHU)][dt5_summary_old]
+  dt_compare[, `:=`(diff = `COVerAGE-DB` - `COVerAGE-DBold`)]
+  dt_compare[, `:=`(pcnt = (diff)/`COVerAGE-DBold`*100)]
+  dt_compare[, Date_old_data:= date_old]
+  dt_compare <- dt_compare[!is.na(`COVerAGE-DB`)]
+  dt5_country2 <- copy(dt5_country)
+  dt5_country2[Sex!="Both", Sex:= "Sex-specific"]
+  dt_compare <- merge(dt_compare, unique(dt5_country2[,.(ISO3Code, Measure, Sex, max_date)]))
+  setorder(dt_compare, Sex, pcnt, Country)
+  fwrite(dt_compare, paste0("data_backup/check/dt5_summary_compare_", format(Sys.Date(), "%Y%m%d"),
+                            "_vs_", date_old))
+  return(dt_compare)
+}
+
 # 
 print_table <- function(data){
   DT::datatable(data, rownames = FALSE, 
@@ -301,23 +324,77 @@ plot_latest_date <- function(dt_date = dt_date){
 }
 
 
-#' world daily report
-#' 
+# get.JHU.daily -----------------------------------------------------------
+#' Get JHU world daily report
+#' If URL unavailable, load latest backup dataset
 get.JHU.daily <- function(){
+  # date0 <- format(Sys.Date(), format = "%m-%d-%Y")
   date1 <- format(Sys.Date()-1, format = "%m-%d-%Y")
-  date2 <- format(Sys.Date()-2, format = "%m-%d-%Y")
   url0 <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/"
   url_daily_report <- paste0(url0, as.character(date1) ,".csv")
-  if(RCurl::url.exists(url_daily_report)){
-    dt_JUH <- fread(url_daily_report)  
-    message("Read JHU: ", date1)
-  } else {
-    dt_JUH <- fread(paste0(url0, as.character(date2) ,".csv"))  
-    message("Read JHU: ", date2)
-  }
-  return(dt_JUH)
+  
+  tryCatch({
+    dt_JHU <- fread(input = url_daily_report);
+    fwrite(dt_JHU, paste0("data_backup/JHU/JHU_daily_report_", Sys.Date()-1,".csv"))
+  },
+    error = function(e){
+          message("URL does not exist, load saved JHU dataset")
+          return(dt_JHU <- fread(get_dir_latest_file("data_backup/JHU", "JHU")))
+        }
+      )
+  
+  return(dt_JHU)
 }
 
+
+# get latest file
+get_dir_latest_file <- function(dir0, pattern0, short = FALSE){
+  files_full <- get.file.name(dir_file = dir0, pattern0 = pattern0)
+  files <- get.file.name(dir_file = dir0, pattern0 = pattern0, full_name = FALSE)
+  file_selected <- if(short)files[find_latest_date(files)] else files_full[find_latest_date(files)]
+  if(length(file_selected)!=0){
+    message(paste(pattern0, "dataset chosen: \n", file_selected))
+    return(file_selected)
+  } else {
+    message("No dataset found in: \n ", dir0)
+    return(NULL)
+  }
+}
+
+find_latest_date <- function(files){
+  remove_string <- c("dt5_country_|.csv|dt5_summary_|Output_5_|JHU_daily_report_")
+  dates <- gsub(remove_string, "", files)
+  # screen for valid date string:
+  # dates <- c("2015", "20200804", "2020-08-01")
+  # return which.max e.g. 2L
+  get.max.date(dates)
+}
+
+get.max.date <- function(mydate) {
+  align.date <- function(mydate){
+    if(!is.na(as.Date(mydate, "%Y-%m-%d"))){
+      mydate <- as.Date(mydate, "%Y-%m-%d")
+    } else if (!is.na(as.Date(mydate, "%Y%m%d"))){
+      mydate <- as.Date(mydate, "%Y%m%d")
+    } else {
+      mydate <- NA
+    }
+    return(mydate)
+  }
+  out <- sapply(mydate, align.date)
+  return(which.max(out))
+}
+
+get.file.name <- function(dir_file,
+                          pattern0,
+                          full_name = TRUE){
+  
+  if(is.null(dir_file))message("dir_file is NULL. Please double check.")
+  if(!dir.exists(dir_file))message("Check if dir_file exists: ", dir_file)
+  files <- list.files(dir_file)
+  files_full <- list.files(dir_file, full.names = TRUE)
+  return(if(full_name)files_full[which(grepl(pattern0, files))] else files[which(grepl(pattern0, files))])
+}
 #' add ISO3Code and region from info.cme to JHU 
 process_dtJHU <- function(dtJHU){
   # dtJHU$ISO3Code <- countrycode::countrycode(dtJHU$Country_Region, origin = "country.name", destination = "iso3c")

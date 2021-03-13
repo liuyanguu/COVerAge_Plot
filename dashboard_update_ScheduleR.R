@@ -56,8 +56,20 @@ fwrite(dt5_summary_simple, (paste0("data_backup/dt5_summary_simple_", Sys.Date()
 fwrite(dt5_summary, (paste0("data_backup/dt5_summary_", Sys.Date() ,".csv")))
 fwrite(dt5_country, (paste0("data_backup/dt5_country_", Sys.Date() ,".csv")))
 
+# check -------------------------------------------------------------------
 
-# write to google sheets
+dt_compare <- get_dt5_summary_compare(dt5_summary, dt5_country)
+dt_compare[pcnt<0]
+dt_compare[pcnt>15]
+
+dt_compare_simple <- dt_compare[, .(Sum_new = sum(`COVerAGE-DB`, na.rm = TRUE),
+                                    Sum_old = sum(`COVerAGE-DBold` , na.rm = TRUE)),
+                                by = .(Measure, Sex)]
+dt_compare_simple[, pcnt := (Sum_new/Sum_old-1)*100]
+dt_compare_simple
+
+
+# write to google sheets ---- 
 library("googlesheets4")
 gs4_auth(email = "yang.liu.uu@gmail.com")
 
