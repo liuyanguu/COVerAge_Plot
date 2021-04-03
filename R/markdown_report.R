@@ -222,7 +222,9 @@ get_summary_table_region2 <- function(dt5_country, dtJHU2, combine_sex = TRUE){
 # compare with the last dataset (country summary )
 get_dt5_summary_compare <- function(dt5_summary, dt5_country){
   dt5_summary_old <- fread(get_dir_latest_file("data_backup", "dt5_summary"))[,.(ISO3Code, Measure, Sex, `COVerAGE-DB`, JHU)]
+  suppressMessages({
   date_old <- gsub("dt5_summary_|.csv", "", get_dir_latest_file("data_backup", "dt5_summary", short = TRUE))
+  })
   date_old <- as.Date(date_old)
   setkey(dt5_summary_old, ISO3Code, Measure, Sex)
   setnames(dt5_summary_old, c("COVerAGE-DB", "JHU"), paste0(c("COVerAGE-DB", "JHU"), "old"))
@@ -280,26 +282,25 @@ load_fresh <- function(backup = FALSE){
 
 #' JHU time series, get both cases and deaths 
 #' @return long-format data 
-get.JHU.ts <- function(cname = NULL){
+get.JHU.ts <- function(){
   url_dth <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv"
   url_case <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
   dt_JUH_ts <- rbindlist(list(fread(url_dth)[, Measure := "Deaths"], fread(url_case)[, Measure := "Cases"]))
   dt_JUH_ts[, `Province/State`:=NULL][, Lat:=NULL][, Long:=NULL]
-  setnames(dt_JUH_ts, "Country/Region", "Country")
-  if(!is.null(cname)) dt_JUH_ts <- dt_JUH_ts[Country %in% cname]
-  dt_JUH_ts_l <- melt.data.table(dt_JUH_ts, id.vars = c("Country", "Measure"), variable.name = "Date",
+  setnames(dt_JUH_ts, "Country/Region", "Country_Region")
+  dt_JUH_ts_l <- melt.data.table(dt_JUH_ts, id.vars = c("Country_Region", "Measure"), variable.name = "Date",
                                  variable.factor = FALSE)
   dt_JUH_ts_l[, Date:= lubridate::mdy(Date)]
-  setorder(dt_JUH_ts_l, Country, Measure)
-  dt_JUH_ts_l[, value2:= shift(value, n=1, fill=NA, type="lag"), by = .(Country, Measure)]
+  setorder(dt_JUH_ts_l, Country_Region, Measure)
+  dt_JUH_ts_l[, value2:= shift(value, n=1, fill=NA, type="lag"), by = .(Country_Region, Measure)]
   dt_JUH_ts_l[, value_daily := value - value2]
   dt_JUH_ts_l <- dt_JUH_ts_l[!is.na(value_daily)]
-  
   return(dt_JUH_ts_l)
 }
 
-plot_country_JHU <- function(dtJHU = dtJHU_country, cname = "Nepal"){
-  g <- ggplot(dtJHU[Country==cname], aes(x = Date, y = value_daily)) +
+plot_country_JHU <- function(dtJHU = dtJHU_country, iso3){
+  if(!iso3%in%unique(dtJHU$ISO3Code)) stop("ISO not found.")
+  g <- ggplot(dtJHU[ISO3Code == iso3], aes(x = Date, y = value_daily)) +
     geom_bar(stat="identity", width=0.5, show.legend = FALSE, color = "#0058AB") + 
     labs(x = "", y = "") + 
     scale_x_date(date_labels = "%Y-%m") +

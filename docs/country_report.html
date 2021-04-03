@@ -13,17 +13,32 @@
 
 <title>Cases and deaths from JHU and MPIDR datasets</title>
 
+<script src="site_libs/header-attrs-2.7/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
-<script src="site_libs/anchor-sections-1.0/anchor-sections.js"></script>
+<script src="site_libs/htmlwidgets-1.5.2/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.9.2.1/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.1.0.1/css/crosstalk.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.1.0.1/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-1.52.2/plotly-latest.min.js"></script>
 <script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
 
@@ -37,11 +52,6 @@
     </style>
 
 <style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
-  pre:not([class]) {
-    background-color: white;
-  }
-</style>
 <script type="text/javascript">
 if (window.hljs) {
   hljs.configure({languages: []});
@@ -54,32 +64,7 @@ if (window.hljs) {
 
 
 
-<style type="text/css">
-h1 {
-  font-size: 34px;
-}
-h1.title {
-  font-size: 38px;
-}
-h2 {
-  font-size: 30px;
-}
-h3 {
-  font-size: 24px;
-}
-h4 {
-  font-size: 18px;
-}
-h5 {
-  font-size: 16px;
-}
-h6 {
-  font-size: 12px;
-}
-.table th:not([align]) {
-  text-align: left;
-}
-</style>
+
 
 
 
@@ -89,10 +74,6 @@ h6 {
   max-width: 940px;
   margin-left: auto;
   margin-right: auto;
-}
-code {
-  color: inherit;
-  background-color: rgba(0, 0, 0, 0.04);
 }
 img {
   max-width:100%;
@@ -109,40 +90,13 @@ button.code-folding-btn:focus {
 summary {
   display: list-item;
 }
+pre code {
+  padding: 0;
+}
 </style>
 
 
 <style type="text/css">
-/* padding for bootstrap navbar */
-body {
-  padding-top: 51px;
-  padding-bottom: 40px;
-}
-/* offset scroll position for anchor links (for fixed navbar)  */
-.section h1 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h2 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h3 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h4 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h5 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h6 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
 .dropdown-submenu {
   position: relative;
 }
@@ -170,7 +124,7 @@ body {
   margin-right: -10px;
 }
 .dropdown-submenu:hover>a:after {
-  border-left-color: #ffffff;
+  border-left-color: #adb5bd;
 }
 .dropdown-submenu.pull-left {
   float: none;
@@ -182,7 +136,7 @@ body {
 }
 </style>
 
-<script>
+<script type="text/javascript">
 // manage active state of menu based on current page
 $(document).ready(function () {
   // active menu anchor
@@ -193,10 +147,23 @@ $(document).ready(function () {
   var menuAnchor = $('a[href="' + href + '"]');
 
   // mark it active
-  menuAnchor.parent().addClass('active');
+  menuAnchor.tab('show');
 
   // if it's got a parent navbar menu mark it active as well
   menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
 });
 </script>
 
@@ -208,7 +175,6 @@ $(document).ready(function () {
   max-height: 500px;
   min-height: 44px;
   overflow-y: auto;
-  background: white;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
@@ -298,7 +264,7 @@ $(document).ready(function () {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-<div class="fluid-row" id="header">
+<div id="header">
 
 
 
@@ -310,19 +276,20 @@ $(document).ready(function () {
 <div id="source-of-data" class="section level2">
 <h2>Source of data</h2>
 <p>Johns Hopkins University (JHU) data refer to the daily-updated data used for their dashboard. The dataset was downloaded from the <a href="https://github.com/CSSEGISandData/COVID-19">project page</a>.</p>
-<p>COVerAGE-DB, led by the Max Planck Institute, is an open-access database including cumulative counts of confirmed COVID-19 cases, deaths, and tests by age and sex. Original data and sources are provided alongside data and measures in standardized and age-harmonized formats. The data were extracted from reports published by official governmental institutions in a variety of formats. The <a href="https://github.com/timriffe/covid_age">project page</a> and the <a href="https://www.medrxiv.org/content/10.1101/2020.09.18.20197228v2">medRxiv paper</a> contain the technical details. The database is still in development. Today it includes 120 countries and 370 subnational areas.</p>
+<p>COVerAGE-DB, led by the Max Planck Institute, is an open-access database including cumulative counts of confirmed COVID-19 cases, deaths, and tests by age and sex. Original data and sources are provided alongside data and measures in standardized and age-harmonized formats. The data were extracted from reports published by official governmental institutions in a variety of formats. The <a href="https://github.com/timriffe/covid_age">project page</a> and the <a href="https://www.medrxiv.org/content/10.1101/2020.09.18.20197228v2">medRxiv paper</a> contain the technical details. The database is still in development. Today it includes 122 countries and 390 subnational areas.</p>
 </div>
-<div id="pakistan" class="section level2">
-<h2>Pakistan</h2>
+<div id="united-states-of-america" class="section level2">
+<h2>United States of America</h2>
 <div id="data-from-johns-hopkins-university" class="section level3">
 <h3>Data from Johns Hopkins University</h3>
-<p><strong>Last updated on 2021-03-06 04:23:41</strong></p>
+<p><strong>Last updated on 2021-04-02 04:20:36</strong></p>
 <p>Figure 1. Daily cases and deaths from Johns Hopkins University</p>
-<p><img src="country_report_files/figure-html/unnamed-chunk-2-1.png" width="768" /></p>
+<div id="htmlwidget-1a48b20c8dd07c7bbf1e" style="width:768px;height:576px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1a48b20c8dd07c7bbf1e">{"x":{"data":[{"orientation":"v","width":[0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5],"base":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"x":[18284,18285,18286,18287,18288,18289,18290,18291,18292,18293,18294,18295,18296,18297,18298,18299,18300,18301,18302,18303,18304,18305,18306,18307,18308,18309,18310,18311,18312,18313,18314,18315,18316,18317,18318,18319,18320,18321,18322,18323,18324,18325,18326,18327,18328,18329,18330,18331,18332,18333,18334,18335,18336,18337,18338,18339,18340,18341,18342,18343,18344,18345,18346,18347,18348,18349,18350,18351,18352,18353,18354,18355,18356,18357,18358,18359,18360,18361,18362,18363,18364,18365,18366,18367,18368,18369,18370,18371,18372,18373,18374,18375,18376,18377,18378,18379,18380,18381,18382,18383,18384,18385,18386,18387,18388,18389,18390,18391,18392,18393,18394,18395,18396,18397,18398,18399,18400,18401,18402,18403,18404,18405,18406,18407,18408,18409,18410,18411,18412,18413,18414,18415,18416,18417,18418,18419,18420,18421,18422,18423,18424,18425,18426,18427,18428,18429,18430,18431,18432,18433,18434,18435,18436,18437,18438,18439,18440,18441,18442,18443,18444,18445,18446,18447,18448,18449,18450,18451,18452,18453,18454,18455,18456,18457,18458,18459,18460,18461,18462,18463,18464,18465,18466,18467,18468,18469,18470,18471,18472,18473,18474,18475,18476,18477,18478,18479,18480,18481,18482,18483,18484,18485,18486,18487,18488,18489,18490,18491,18492,18493,18494,18495,18496,18497,18498,18499,18500,18501,18502,18503,18504,18505,18506,18507,18508,18509,18510,18511,18512,18513,18514,18515,18516,18517,18518,18519,18520,18521,18522,18523,18524,18525,18526,18527,18528,18529,18530,18531,18532,18533,18534,18535,18536,18537,18538,18539,18540,18541,18542,18543,18544,18545,18546,18547,18548,18549,18550,18551,18552,18553,18554,18555,18556,18557,18558,18559,18560,18561,18562,18563,18564,18565,18566,18567,18568,18569,18570,18571,18572,18573,18574,18575,18576,18577,18578,18579,18580,18581,18582,18583,18584,18585,18586,18587,18588,18589,18590,18591,18592,18593,18594,18595,18596,18597,18598,18599,18600,18601,18602,18603,18604,18605,18606,18607,18608,18609,18610,18611,18612,18613,18614,18615,18616,18617,18618,18619,18620,18621,18622,18623,18624,18625,18626,18627,18628,18629,18630,18631,18632,18633,18634,18635,18636,18637,18638,18639,18640,18641,18642,18643,18644,18645,18646,18647,18648,18649,18650,18651,18652,18653,18654,18655,18656,18657,18658,18659,18660,18661,18662,18663,18664,18665,18666,18667,18668,18669,18670,18671,18672,18673,18674,18675,18676,18677,18678,18679,18680,18681,18682,18683,18684,18685,18686,18687,18688,18689,18690,18691,18692,18693,18694,18695,18696,18697,18698,18699,18700,18701,18702,18703,18704,18705,18706,18707,18708,18709,18710,18711,18712,18713,18714,18715,18716,18717,18718],"y":[0,1,0,3,0,0,1,0,2,0,0,3,0,0,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0,2,0,0,0,0,0,1,0,8,7,23,19,33,77,53,166,116,75,188,365,439,633,759,234,1467,1833,2657,4494,6367,5995,8873,11238,10619,12082,17856,18690,19630,18899,22075,26314,32243,32235,32287,32416,29877,31381,30767,31192,35941,34415,29130,27255,26930,28781,25440,30035,33030,27932,26096,29828,25917,28859,33570,32327,30396,26501,23703,24577,26438,29220,34926,27350,24297,24085,24531,24560,27411,26839,25136,18867,19271,22948,20408,26818,24747,24159,18363,22390,21007,22697,25766,23657,21111,20067,18673,19650,18549,22322,24473,23633,18987,17436,21502,19855,21639,25400,21160,17916,17637,18384,21110,23133,24866,25208,18948,19819,23670,27064,28526,31562,32270,25148,32152,37075,35876,40317,45994,41346,40730,41283,46430,51819,56629,51361,45681,50768,43085,60654,60119,62496,68055,60033,58438,58896,68036,68120,75820,72261,62535,60476,62090,64520,70564,68440,73323,64915,54865,56761,66457,71853,67457,68719,56184,45545,45529,58801,54457,59357,59297,54119,45754,47624,48001,56049,51314,65340,46921,39192,36676,45034,47359,43846,48743,43068,34264,36653,40168,45360,45230,46983,42694,34400,35513,41729,41006,44192,50459,43001,31311,23508,27469,33911,36173,47724,41126,34297,34426,39556,38924,45225,49243,42154,38403,52039,39850,39072,47103,48275,44650,37543,33257,43419,39433,45652,54859,48594,35767,39466,45200,51084,58591,56358,54961,45900,41876,52233,59778,64864,69165,56710,49352,67778,61966,63258,76340,81882,82797,62110,67424,76791,79416,91099,99126,89779,104918,85308,127116,104608,129354,128005,127308,115214,120573,140496,146626,164839,180389,167761,136224,162945,163922,173177,191548,198297,179274,146784,174449,175514,183287,112322,208188,155533,140234,160570,188219,202557,223613,232785,215542,181012,194858,224492,222539,231515,239973,217582,187696,193824,209980,246694,239717,251959,191894,187796,199033,197996,229604,194193,97646,226268,155621,174604,200231,233659,235656,153628,300295,208731,184265,235099,255425,278265,293262,262622,213237,214975,226909,230349,235700,242725,201669,177763,143398,176688,183218,193803,190737,170595,131051,151948,147519,153278,169242,166554,142299,111989,135184,115317,121621,123961,134390,103977,89630,90298,95621,95165,105741,99616,87106,65010,54184,62711,70117,69597,79597,71519,57069,56208,72255,74717,77492,76971,64428,51197,58888,57052,67184,68045,66445,58191,40939,45014,57698,57906,62462,61317,53120,38212,56649,53946,59121,60525,61620,55369,33760,51577,53588,86951,67452,77314,62078,43695,69420,61240,67029,79034],"text":["Date: 2020-01-23<br />value_daily:      0","Date: 2020-01-24<br />value_daily:      1","Date: 2020-01-25<br />value_daily:      0","Date: 2020-01-26<br />value_daily:      3","Date: 2020-01-27<br />value_daily:      0","Date: 2020-01-28<br />value_daily:      0","Date: 2020-01-29<br />value_daily:      1","Date: 2020-01-30<br />value_daily:      0","Date: 2020-01-31<br />value_daily:      2","Date: 2020-02-01<br />value_daily:      0","Date: 2020-02-02<br />value_daily:      0","Date: 2020-02-03<br />value_daily:      3","Date: 2020-02-04<br />value_daily:      0","Date: 2020-02-05<br />value_daily:      0","Date: 2020-02-06<br />value_daily:      1","Date: 2020-02-07<br />value_daily:      0","Date: 2020-02-08<br />value_daily:      0","Date: 2020-02-09<br />value_daily:      0","Date: 2020-02-10<br />value_daily:      0","Date: 2020-02-11<br />value_daily:      1","Date: 2020-02-12<br />value_daily:      0","Date: 2020-02-13<br />value_daily:      1","Date: 2020-02-14<br />value_daily:      0","Date: 2020-02-15<br />value_daily:      0","Date: 2020-02-16<br />value_daily:      0","Date: 2020-02-17<br />value_daily:      0","Date: 2020-02-18<br />value_daily:      0","Date: 2020-02-19<br />value_daily:      0","Date: 2020-02-20<br />value_daily:      0","Date: 2020-02-21<br />value_daily:      2","Date: 2020-02-22<br />value_daily:      0","Date: 2020-02-23<br />value_daily:      0","Date: 2020-02-24<br />value_daily:      0","Date: 2020-02-25<br />value_daily:      0","Date: 2020-02-26<br />value_daily:      0","Date: 2020-02-27<br />value_daily:      1","Date: 2020-02-28<br />value_daily:      0","Date: 2020-02-29<br />value_daily:      8","Date: 2020-03-01<br />value_daily:      7","Date: 2020-03-02<br />value_daily:     23","Date: 2020-03-03<br />value_daily:     19","Date: 2020-03-04<br />value_daily:     33","Date: 2020-03-05<br />value_daily:     77","Date: 2020-03-06<br />value_daily:     53","Date: 2020-03-07<br />value_daily:    166","Date: 2020-03-08<br />value_daily:    116","Date: 2020-03-09<br />value_daily:     75","Date: 2020-03-10<br />value_daily:    188","Date: 2020-03-11<br />value_daily:    365","Date: 2020-03-12<br />value_daily:    439","Date: 2020-03-13<br />value_daily:    633","Date: 2020-03-14<br />value_daily:    759","Date: 2020-03-15<br />value_daily:    234","Date: 2020-03-16<br />value_daily:   1467","Date: 2020-03-17<br />value_daily:   1833","Date: 2020-03-18<br />value_daily:   2657","Date: 2020-03-19<br />value_daily:   4494","Date: 2020-03-20<br />value_daily:   6367","Date: 2020-03-21<br />value_daily:   5995","Date: 2020-03-22<br />value_daily:   8873","Date: 2020-03-23<br />value_daily:  11238","Date: 2020-03-24<br />value_daily:  10619","Date: 2020-03-25<br />value_daily:  12082","Date: 2020-03-26<br />value_daily:  17856","Date: 2020-03-27<br />value_daily:  18690","Date: 2020-03-28<br />value_daily:  19630","Date: 2020-03-29<br />value_daily:  18899","Date: 2020-03-30<br />value_daily:  22075","Date: 2020-03-31<br />value_daily:  26314","Date: 2020-04-01<br />value_daily:  32243","Date: 2020-04-02<br />value_daily:  32235","Date: 2020-04-03<br />value_daily:  32287","Date: 2020-04-04<br />value_daily:  32416","Date: 2020-04-05<br />value_daily:  29877","Date: 2020-04-06<br />value_daily:  31381","Date: 2020-04-07<br />value_daily:  30767","Date: 2020-04-08<br />value_daily:  31192","Date: 2020-04-09<br />value_daily:  35941","Date: 2020-04-10<br />value_daily:  34415","Date: 2020-04-11<br />value_daily:  29130","Date: 2020-04-12<br />value_daily:  27255","Date: 2020-04-13<br />value_daily:  26930","Date: 2020-04-14<br />value_daily:  28781","Date: 2020-04-15<br />value_daily:  25440","Date: 2020-04-16<br />value_daily:  30035","Date: 2020-04-17<br />value_daily:  33030","Date: 2020-04-18<br />value_daily:  27932","Date: 2020-04-19<br />value_daily:  26096","Date: 2020-04-20<br />value_daily:  29828","Date: 2020-04-21<br />value_daily:  25917","Date: 2020-04-22<br />value_daily:  28859","Date: 2020-04-23<br />value_daily:  33570","Date: 2020-04-24<br />value_daily:  32327","Date: 2020-04-25<br />value_daily:  30396","Date: 2020-04-26<br />value_daily:  26501","Date: 2020-04-27<br />value_daily:  23703","Date: 2020-04-28<br />value_daily:  24577","Date: 2020-04-29<br />value_daily:  26438","Date: 2020-04-30<br />value_daily:  29220","Date: 2020-05-01<br />value_daily:  34926","Date: 2020-05-02<br />value_daily:  27350","Date: 2020-05-03<br />value_daily:  24297","Date: 2020-05-04<br />value_daily:  24085","Date: 2020-05-05<br />value_daily:  24531","Date: 2020-05-06<br />value_daily:  24560","Date: 2020-05-07<br />value_daily:  27411","Date: 2020-05-08<br />value_daily:  26839","Date: 2020-05-09<br />value_daily:  25136","Date: 2020-05-10<br />value_daily:  18867","Date: 2020-05-11<br />value_daily:  19271","Date: 2020-05-12<br />value_daily:  22948","Date: 2020-05-13<br />value_daily:  20408","Date: 2020-05-14<br />value_daily:  26818","Date: 2020-05-15<br />value_daily:  24747","Date: 2020-05-16<br />value_daily:  24159","Date: 2020-05-17<br />value_daily:  18363","Date: 2020-05-18<br />value_daily:  22390","Date: 2020-05-19<br />value_daily:  21007","Date: 2020-05-20<br />value_daily:  22697","Date: 2020-05-21<br />value_daily:  25766","Date: 2020-05-22<br />value_daily:  23657","Date: 2020-05-23<br />value_daily:  21111","Date: 2020-05-24<br />value_daily:  20067","Date: 2020-05-25<br />value_daily:  18673","Date: 2020-05-26<br />value_daily:  19650","Date: 2020-05-27<br />value_daily:  18549","Date: 2020-05-28<br />value_daily:  22322","Date: 2020-05-29<br />value_daily:  24473","Date: 2020-05-30<br />value_daily:  23633","Date: 2020-05-31<br />value_daily:  18987","Date: 2020-06-01<br />value_daily:  17436","Date: 2020-06-02<br />value_daily:  21502","Date: 2020-06-03<br />value_daily:  19855","Date: 2020-06-04<br />value_daily:  21639","Date: 2020-06-05<br />value_daily:  25400","Date: 2020-06-06<br />value_daily:  21160","Date: 2020-06-07<br />value_daily:  17916","Date: 2020-06-08<br />value_daily:  17637","Date: 2020-06-09<br />value_daily:  18384","Date: 2020-06-10<br />value_daily:  21110","Date: 2020-06-11<br />value_daily:  23133","Date: 2020-06-12<br />value_daily:  24866","Date: 2020-06-13<br />value_daily:  25208","Date: 2020-06-14<br />value_daily:  18948","Date: 2020-06-15<br />value_daily:  19819","Date: 2020-06-16<br />value_daily:  23670","Date: 2020-06-17<br />value_daily:  27064","Date: 2020-06-18<br />value_daily:  28526","Date: 2020-06-19<br />value_daily:  31562","Date: 2020-06-20<br />value_daily:  32270","Date: 2020-06-21<br />value_daily:  25148","Date: 2020-06-22<br />value_daily:  32152","Date: 2020-06-23<br />value_daily:  37075","Date: 2020-06-24<br />value_daily:  35876","Date: 2020-06-25<br />value_daily:  40317","Date: 2020-06-26<br />value_daily:  45994","Date: 2020-06-27<br />value_daily:  41346","Date: 2020-06-28<br />value_daily:  40730","Date: 2020-06-29<br />value_daily:  41283","Date: 2020-06-30<br />value_daily:  46430","Date: 2020-07-01<br />value_daily:  51819","Date: 2020-07-02<br />value_daily:  56629","Date: 2020-07-03<br />value_daily:  51361","Date: 2020-07-04<br />value_daily:  45681","Date: 2020-07-05<br />value_daily:  50768","Date: 2020-07-06<br />value_daily:  43085","Date: 2020-07-07<br />value_daily:  60654","Date: 2020-07-08<br />value_daily:  60119","Date: 2020-07-09<br />value_daily:  62496","Date: 2020-07-10<br />value_daily:  68055","Date: 2020-07-11<br />value_daily:  60033","Date: 2020-07-12<br />value_daily:  58438","Date: 2020-07-13<br />value_daily:  58896","Date: 2020-07-14<br />value_daily:  68036","Date: 2020-07-15<br />value_daily:  68120","Date: 2020-07-16<br />value_daily:  75820","Date: 2020-07-17<br />value_daily:  72261","Date: 2020-07-18<br />value_daily:  62535","Date: 2020-07-19<br />value_daily:  60476","Date: 2020-07-20<br />value_daily:  62090","Date: 2020-07-21<br />value_daily:  64520","Date: 2020-07-22<br />value_daily:  70564","Date: 2020-07-23<br />value_daily:  68440","Date: 2020-07-24<br />value_daily:  73323","Date: 2020-07-25<br />value_daily:  64915","Date: 2020-07-26<br />value_daily:  54865","Date: 2020-07-27<br />value_daily:  56761","Date: 2020-07-28<br />value_daily:  66457","Date: 2020-07-29<br />value_daily:  71853","Date: 2020-07-30<br />value_daily:  67457","Date: 2020-07-31<br />value_daily:  68719","Date: 2020-08-01<br />value_daily:  56184","Date: 2020-08-02<br />value_daily:  45545","Date: 2020-08-03<br />value_daily:  45529","Date: 2020-08-04<br />value_daily:  58801","Date: 2020-08-05<br />value_daily:  54457","Date: 2020-08-06<br />value_daily:  59357","Date: 2020-08-07<br />value_daily:  59297","Date: 2020-08-08<br />value_daily:  54119","Date: 2020-08-09<br />value_daily:  45754","Date: 2020-08-10<br />value_daily:  47624","Date: 2020-08-11<br />value_daily:  48001","Date: 2020-08-12<br />value_daily:  56049","Date: 2020-08-13<br />value_daily:  51314","Date: 2020-08-14<br />value_daily:  65340","Date: 2020-08-15<br />value_daily:  46921","Date: 2020-08-16<br />value_daily:  39192","Date: 2020-08-17<br />value_daily:  36676","Date: 2020-08-18<br />value_daily:  45034","Date: 2020-08-19<br />value_daily:  47359","Date: 2020-08-20<br />value_daily:  43846","Date: 2020-08-21<br />value_daily:  48743","Date: 2020-08-22<br />value_daily:  43068","Date: 2020-08-23<br />value_daily:  34264","Date: 2020-08-24<br />value_daily:  36653","Date: 2020-08-25<br />value_daily:  40168","Date: 2020-08-26<br />value_daily:  45360","Date: 2020-08-27<br />value_daily:  45230","Date: 2020-08-28<br />value_daily:  46983","Date: 2020-08-29<br />value_daily:  42694","Date: 2020-08-30<br />value_daily:  34400","Date: 2020-08-31<br />value_daily:  35513","Date: 2020-09-01<br />value_daily:  41729","Date: 2020-09-02<br />value_daily:  41006","Date: 2020-09-03<br />value_daily:  44192","Date: 2020-09-04<br />value_daily:  50459","Date: 2020-09-05<br />value_daily:  43001","Date: 2020-09-06<br />value_daily:  31311","Date: 2020-09-07<br />value_daily:  23508","Date: 2020-09-08<br />value_daily:  27469","Date: 2020-09-09<br />value_daily:  33911","Date: 2020-09-10<br />value_daily:  36173","Date: 2020-09-11<br />value_daily:  47724","Date: 2020-09-12<br />value_daily:  41126","Date: 2020-09-13<br />value_daily:  34297","Date: 2020-09-14<br />value_daily:  34426","Date: 2020-09-15<br />value_daily:  39556","Date: 2020-09-16<br />value_daily:  38924","Date: 2020-09-17<br />value_daily:  45225","Date: 2020-09-18<br />value_daily:  49243","Date: 2020-09-19<br />value_daily:  42154","Date: 2020-09-20<br />value_daily:  38403","Date: 2020-09-21<br />value_daily:  52039","Date: 2020-09-22<br />value_daily:  39850","Date: 2020-09-23<br />value_daily:  39072","Date: 2020-09-24<br />value_daily:  47103","Date: 2020-09-25<br />value_daily:  48275","Date: 2020-09-26<br />value_daily:  44650","Date: 2020-09-27<br />value_daily:  37543","Date: 2020-09-28<br />value_daily:  33257","Date: 2020-09-29<br />value_daily:  43419","Date: 2020-09-30<br />value_daily:  39433","Date: 2020-10-01<br />value_daily:  45652","Date: 2020-10-02<br />value_daily:  54859","Date: 2020-10-03<br />value_daily:  48594","Date: 2020-10-04<br />value_daily:  35767","Date: 2020-10-05<br />value_daily:  39466","Date: 2020-10-06<br />value_daily:  45200","Date: 2020-10-07<br />value_daily:  51084","Date: 2020-10-08<br />value_daily:  58591","Date: 2020-10-09<br />value_daily:  56358","Date: 2020-10-10<br />value_daily:  54961","Date: 2020-10-11<br />value_daily:  45900","Date: 2020-10-12<br />value_daily:  41876","Date: 2020-10-13<br />value_daily:  52233","Date: 2020-10-14<br />value_daily:  59778","Date: 2020-10-15<br />value_daily:  64864","Date: 2020-10-16<br />value_daily:  69165","Date: 2020-10-17<br />value_daily:  56710","Date: 2020-10-18<br />value_daily:  49352","Date: 2020-10-19<br />value_daily:  67778","Date: 2020-10-20<br />value_daily:  61966","Date: 2020-10-21<br />value_daily:  63258","Date: 2020-10-22<br />value_daily:  76340","Date: 2020-10-23<br />value_daily:  81882","Date: 2020-10-24<br />value_daily:  82797","Date: 2020-10-25<br />value_daily:  62110","Date: 2020-10-26<br />value_daily:  67424","Date: 2020-10-27<br />value_daily:  76791","Date: 2020-10-28<br />value_daily:  79416","Date: 2020-10-29<br />value_daily:  91099","Date: 2020-10-30<br />value_daily:  99126","Date: 2020-10-31<br />value_daily:  89779","Date: 2020-11-01<br />value_daily: 104918","Date: 2020-11-02<br />value_daily:  85308","Date: 2020-11-03<br />value_daily: 127116","Date: 2020-11-04<br />value_daily: 104608","Date: 2020-11-05<br />value_daily: 129354","Date: 2020-11-06<br />value_daily: 128005","Date: 2020-11-07<br />value_daily: 127308","Date: 2020-11-08<br />value_daily: 115214","Date: 2020-11-09<br />value_daily: 120573","Date: 2020-11-10<br />value_daily: 140496","Date: 2020-11-11<br />value_daily: 146626","Date: 2020-11-12<br />value_daily: 164839","Date: 2020-11-13<br />value_daily: 180389","Date: 2020-11-14<br />value_daily: 167761","Date: 2020-11-15<br />value_daily: 136224","Date: 2020-11-16<br />value_daily: 162945","Date: 2020-11-17<br />value_daily: 163922","Date: 2020-11-18<br />value_daily: 173177","Date: 2020-11-19<br />value_daily: 191548","Date: 2020-11-20<br />value_daily: 198297","Date: 2020-11-21<br />value_daily: 179274","Date: 2020-11-22<br />value_daily: 146784","Date: 2020-11-23<br />value_daily: 174449","Date: 2020-11-24<br />value_daily: 175514","Date: 2020-11-25<br />value_daily: 183287","Date: 2020-11-26<br />value_daily: 112322","Date: 2020-11-27<br />value_daily: 208188","Date: 2020-11-28<br />value_daily: 155533","Date: 2020-11-29<br />value_daily: 140234","Date: 2020-11-30<br />value_daily: 160570","Date: 2020-12-01<br />value_daily: 188219","Date: 2020-12-02<br />value_daily: 202557","Date: 2020-12-03<br />value_daily: 223613","Date: 2020-12-04<br />value_daily: 232785","Date: 2020-12-05<br />value_daily: 215542","Date: 2020-12-06<br />value_daily: 181012","Date: 2020-12-07<br />value_daily: 194858","Date: 2020-12-08<br />value_daily: 224492","Date: 2020-12-09<br />value_daily: 222539","Date: 2020-12-10<br />value_daily: 231515","Date: 2020-12-11<br />value_daily: 239973","Date: 2020-12-12<br />value_daily: 217582","Date: 2020-12-13<br />value_daily: 187696","Date: 2020-12-14<br />value_daily: 193824","Date: 2020-12-15<br />value_daily: 209980","Date: 2020-12-16<br />value_daily: 246694","Date: 2020-12-17<br />value_daily: 239717","Date: 2020-12-18<br />value_daily: 251959","Date: 2020-12-19<br />value_daily: 191894","Date: 2020-12-20<br />value_daily: 187796","Date: 2020-12-21<br />value_daily: 199033","Date: 2020-12-22<br />value_daily: 197996","Date: 2020-12-23<br />value_daily: 229604","Date: 2020-12-24<br />value_daily: 194193","Date: 2020-12-25<br />value_daily:  97646","Date: 2020-12-26<br />value_daily: 226268","Date: 2020-12-27<br />value_daily: 155621","Date: 2020-12-28<br />value_daily: 174604","Date: 2020-12-29<br />value_daily: 200231","Date: 2020-12-30<br />value_daily: 233659","Date: 2020-12-31<br />value_daily: 235656","Date: 2021-01-01<br />value_daily: 153628","Date: 2021-01-02<br />value_daily: 300295","Date: 2021-01-03<br />value_daily: 208731","Date: 2021-01-04<br />value_daily: 184265","Date: 2021-01-05<br />value_daily: 235099","Date: 2021-01-06<br />value_daily: 255425","Date: 2021-01-07<br />value_daily: 278265","Date: 2021-01-08<br />value_daily: 293262","Date: 2021-01-09<br />value_daily: 262622","Date: 2021-01-10<br />value_daily: 213237","Date: 2021-01-11<br />value_daily: 214975","Date: 2021-01-12<br />value_daily: 226909","Date: 2021-01-13<br />value_daily: 230349","Date: 2021-01-14<br />value_daily: 235700","Date: 2021-01-15<br />value_daily: 242725","Date: 2021-01-16<br />value_daily: 201669","Date: 2021-01-17<br />value_daily: 177763","Date: 2021-01-18<br />value_daily: 143398","Date: 2021-01-19<br />value_daily: 176688","Date: 2021-01-20<br />value_daily: 183218","Date: 2021-01-21<br />value_daily: 193803","Date: 2021-01-22<br />value_daily: 190737","Date: 2021-01-23<br />value_daily: 170595","Date: 2021-01-24<br />value_daily: 131051","Date: 2021-01-25<br />value_daily: 151948","Date: 2021-01-26<br />value_daily: 147519","Date: 2021-01-27<br />value_daily: 153278","Date: 2021-01-28<br />value_daily: 169242","Date: 2021-01-29<br />value_daily: 166554","Date: 2021-01-30<br />value_daily: 142299","Date: 2021-01-31<br />value_daily: 111989","Date: 2021-02-01<br />value_daily: 135184","Date: 2021-02-02<br />value_daily: 115317","Date: 2021-02-03<br />value_daily: 121621","Date: 2021-02-04<br />value_daily: 123961","Date: 2021-02-05<br />value_daily: 134390","Date: 2021-02-06<br />value_daily: 103977","Date: 2021-02-07<br />value_daily:  89630","Date: 2021-02-08<br />value_daily:  90298","Date: 2021-02-09<br />value_daily:  95621","Date: 2021-02-10<br />value_daily:  95165","Date: 2021-02-11<br />value_daily: 105741","Date: 2021-02-12<br />value_daily:  99616","Date: 2021-02-13<br />value_daily:  87106","Date: 2021-02-14<br />value_daily:  65010","Date: 2021-02-15<br />value_daily:  54184","Date: 2021-02-16<br />value_daily:  62711","Date: 2021-02-17<br />value_daily:  70117","Date: 2021-02-18<br />value_daily:  69597","Date: 2021-02-19<br />value_daily:  79597","Date: 2021-02-20<br />value_daily:  71519","Date: 2021-02-21<br />value_daily:  57069","Date: 2021-02-22<br />value_daily:  56208","Date: 2021-02-23<br />value_daily:  72255","Date: 2021-02-24<br />value_daily:  74717","Date: 2021-02-25<br />value_daily:  77492","Date: 2021-02-26<br />value_daily:  76971","Date: 2021-02-27<br />value_daily:  64428","Date: 2021-02-28<br />value_daily:  51197","Date: 2021-03-01<br />value_daily:  58888","Date: 2021-03-02<br />value_daily:  57052","Date: 2021-03-03<br />value_daily:  67184","Date: 2021-03-04<br />value_daily:  68045","Date: 2021-03-05<br />value_daily:  66445","Date: 2021-03-06<br />value_daily:  58191","Date: 2021-03-07<br />value_daily:  40939","Date: 2021-03-08<br />value_daily:  45014","Date: 2021-03-09<br />value_daily:  57698","Date: 2021-03-10<br />value_daily:  57906","Date: 2021-03-11<br />value_daily:  62462","Date: 2021-03-12<br />value_daily:  61317","Date: 2021-03-13<br />value_daily:  53120","Date: 2021-03-14<br />value_daily:  38212","Date: 2021-03-15<br />value_daily:  56649","Date: 2021-03-16<br />value_daily:  53946","Date: 2021-03-17<br />value_daily:  59121","Date: 2021-03-18<br />value_daily:  60525","Date: 2021-03-19<br />value_daily:  61620","Date: 2021-03-20<br />value_daily:  55369","Date: 2021-03-21<br />value_daily:  33760","Date: 2021-03-22<br />value_daily:  51577","Date: 2021-03-23<br />value_daily:  53588","Date: 2021-03-24<br />value_daily:  86951","Date: 2021-03-25<br />value_daily:  67452","Date: 2021-03-26<br />value_daily:  77314","Date: 2021-03-27<br />value_daily:  62078","Date: 2021-03-28<br />value_daily:  43695","Date: 2021-03-29<br />value_daily:  69420","Date: 2021-03-30<br />value_daily:  61240","Date: 2021-03-31<br />value_daily:  67029","Date: 2021-04-01<br />value_daily:  79034"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(89,89,89,1)","line":{"width":1.88976377952756,"color":"rgba(0,88,171,1)"}},"showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"orientation":"v","width":[0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5],"base":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"x":[18284,18285,18286,18287,18288,18289,18290,18291,18292,18293,18294,18295,18296,18297,18298,18299,18300,18301,18302,18303,18304,18305,18306,18307,18308,18309,18310,18311,18312,18313,18314,18315,18316,18317,18318,18319,18320,18321,18322,18323,18324,18325,18326,18327,18328,18329,18330,18331,18332,18333,18334,18335,18336,18337,18338,18339,18340,18341,18342,18343,18344,18345,18346,18347,18348,18349,18350,18351,18352,18353,18354,18355,18356,18357,18358,18359,18360,18361,18362,18363,18364,18365,18366,18367,18368,18369,18370,18371,18372,18373,18374,18375,18376,18377,18378,18379,18380,18381,18382,18383,18384,18385,18386,18387,18388,18389,18390,18391,18392,18393,18394,18395,18396,18397,18398,18399,18400,18401,18402,18403,18404,18405,18406,18407,18408,18409,18410,18411,18412,18413,18414,18415,18416,18417,18418,18419,18420,18421,18422,18423,18424,18425,18426,18427,18428,18429,18430,18431,18432,18433,18434,18435,18436,18437,18438,18439,18440,18441,18442,18443,18444,18445,18446,18447,18448,18449,18450,18451,18452,18453,18454,18455,18456,18457,18458,18459,18460,18461,18462,18463,18464,18465,18466,18467,18468,18469,18470,18471,18472,18473,18474,18475,18476,18477,18478,18479,18480,18481,18482,18483,18484,18485,18486,18487,18488,18489,18490,18491,18492,18493,18494,18495,18496,18497,18498,18499,18500,18501,18502,18503,18504,18505,18506,18507,18508,18509,18510,18511,18512,18513,18514,18515,18516,18517,18518,18519,18520,18521,18522,18523,18524,18525,18526,18527,18528,18529,18530,18531,18532,18533,18534,18535,18536,18537,18538,18539,18540,18541,18542,18543,18544,18545,18546,18547,18548,18549,18550,18551,18552,18553,18554,18555,18556,18557,18558,18559,18560,18561,18562,18563,18564,18565,18566,18567,18568,18569,18570,18571,18572,18573,18574,18575,18576,18577,18578,18579,18580,18581,18582,18583,18584,18585,18586,18587,18588,18589,18590,18591,18592,18593,18594,18595,18596,18597,18598,18599,18600,18601,18602,18603,18604,18605,18606,18607,18608,18609,18610,18611,18612,18613,18614,18615,18616,18617,18618,18619,18620,18621,18622,18623,18624,18625,18626,18627,18628,18629,18630,18631,18632,18633,18634,18635,18636,18637,18638,18639,18640,18641,18642,18643,18644,18645,18646,18647,18648,18649,18650,18651,18652,18653,18654,18655,18656,18657,18658,18659,18660,18661,18662,18663,18664,18665,18666,18667,18668,18669,18670,18671,18672,18673,18674,18675,18676,18677,18678,18679,18680,18681,18682,18683,18684,18685,18686,18687,18688,18689,18690,18691,18692,18693,18694,18695,18696,18697,18698,18699,18700,18701,18702,18703,18704,18705,18706,18707,18708,18709,18710,18711,18712,18713,18714,18715,18716,18717,18718],"y":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,5,1,4,1,2,3,4,1,6,5,10,8,7,12,27,37,60,72,106,103,121,192,243,333,420,522,642,624,713,1085,1284,1512,1430,1565,1613,1771,2578,2155,2202,2194,2128,1873,2013,2434,2605,2143,2109,1980,1970,2232,2516,2452,2463,2186,1710,1399,1508,2227,2415,2197,1905,1732,1189,1379,2246,2312,1927,1761,1467,976,1043,1600,1738,1787,1670,1199,818,1227,1457,1500,1188,1220,1086,637,592,677,1462,1107,1133,954,613,776,981,1011,1011,894,643,456,507,913,873,830,829,733,342,395,814,739,690,628,562,314,408,748,748,530,626,502,319,383,557,705,716,667,306,325,376,1163,841,1012,806,727,472,444,929,973,955,925,869,466,563,1094,1223,1086,1100,913,534,1120,1341,1427,1226,1217,1094,431,579,1340,1397,1238,1232,1075,560,588,1020,1503,1062,1340,1004,609,491,1273,1300,1093,1083,975,496,474,1227,1184,1099,958,902,465,542,1044,1061,1032,950,782,444,297,455,1150,902,1172,723,426,438,1202,944,866,908,722,268,428,1029,1055,907,928,776,316,358,860,936,867,855,681,383,481,689,920,993,968,654,468,395,794,983,858,932,769,490,478,925,1150,889,960,952,459,533,970,1038,1001,1068,908,496,573,1578,1122,1149,1233,1077,571,779,1418,1436,1203,1200,1346,775,829,1719,1936,2040,1948,1615,1032,1097,2129,2259,1385,1550,1359,1036,1346,2547,2819,2950,2677,2345,1352,1614,2627,3177,2992,3415,2456,1626,1656,3101,3721,3465,2942,2651,1711,1938,3392,3419,2910,1400,1879,1430,2003,3629,3729,3447,2154,2503,1441,2098,3691,3929,3966,4091,3334,1999,2096,4476,4027,3973,3898,3428,1868,1514,2731,4406,4181,3833,3343,1898,1971,4033,3954,4026,3613,2770,1841,2048,3474,3881,3744,3623,2600,1367,1607,3074,3325,3179,2915,2189,1128,951,1730,2408,2474,2652,1799,1214,1299,2271,3172,2365,2107,1507,1059,1536,1946,2494,1935,1781,1503,686,740,1801,1570,1564,1573,1737,579,747,1161,1182,1620,1097,779,448,562,848,1456,1559,1121,741,507,701,875,1076,1064],"text":["Date: 2020-01-23<br />value_daily:      0","Date: 2020-01-24<br />value_daily:      0","Date: 2020-01-25<br />value_daily:      0","Date: 2020-01-26<br />value_daily:      0","Date: 2020-01-27<br />value_daily:      0","Date: 2020-01-28<br />value_daily:      0","Date: 2020-01-29<br />value_daily:      0","Date: 2020-01-30<br />value_daily:      0","Date: 2020-01-31<br />value_daily:      0","Date: 2020-02-01<br />value_daily:      0","Date: 2020-02-02<br />value_daily:      0","Date: 2020-02-03<br />value_daily:      0","Date: 2020-02-04<br />value_daily:      0","Date: 2020-02-05<br />value_daily:      0","Date: 2020-02-06<br />value_daily:      0","Date: 2020-02-07<br />value_daily:      0","Date: 2020-02-08<br />value_daily:      0","Date: 2020-02-09<br />value_daily:      0","Date: 2020-02-10<br />value_daily:      0","Date: 2020-02-11<br />value_daily:      0","Date: 2020-02-12<br />value_daily:      0","Date: 2020-02-13<br />value_daily:      0","Date: 2020-02-14<br />value_daily:      0","Date: 2020-02-15<br />value_daily:      0","Date: 2020-02-16<br />value_daily:      0","Date: 2020-02-17<br />value_daily:      0","Date: 2020-02-18<br />value_daily:      0","Date: 2020-02-19<br />value_daily:      0","Date: 2020-02-20<br />value_daily:      0","Date: 2020-02-21<br />value_daily:      0","Date: 2020-02-22<br />value_daily:      0","Date: 2020-02-23<br />value_daily:      0","Date: 2020-02-24<br />value_daily:      0","Date: 2020-02-25<br />value_daily:      0","Date: 2020-02-26<br />value_daily:      0","Date: 2020-02-27<br />value_daily:      0","Date: 2020-02-28<br />value_daily:      0","Date: 2020-02-29<br />value_daily:      1","Date: 2020-03-01<br />value_daily:      0","Date: 2020-03-02<br />value_daily:      5","Date: 2020-03-03<br />value_daily:      1","Date: 2020-03-04<br />value_daily:      4","Date: 2020-03-05<br />value_daily:      1","Date: 2020-03-06<br />value_daily:      2","Date: 2020-03-07<br />value_daily:      3","Date: 2020-03-08<br />value_daily:      4","Date: 2020-03-09<br />value_daily:      1","Date: 2020-03-10<br />value_daily:      6","Date: 2020-03-11<br />value_daily:      5","Date: 2020-03-12<br />value_daily:     10","Date: 2020-03-13<br />value_daily:      8","Date: 2020-03-14<br />value_daily:      7","Date: 2020-03-15<br />value_daily:     12","Date: 2020-03-16<br />value_daily:     27","Date: 2020-03-17<br />value_daily:     37","Date: 2020-03-18<br />value_daily:     60","Date: 2020-03-19<br />value_daily:     72","Date: 2020-03-20<br />value_daily:    106","Date: 2020-03-21<br />value_daily:    103","Date: 2020-03-22<br />value_daily:    121","Date: 2020-03-23<br />value_daily:    192","Date: 2020-03-24<br />value_daily:    243","Date: 2020-03-25<br />value_daily:    333","Date: 2020-03-26<br />value_daily:    420","Date: 2020-03-27<br />value_daily:    522","Date: 2020-03-28<br />value_daily:    642","Date: 2020-03-29<br />value_daily:    624","Date: 2020-03-30<br />value_daily:    713","Date: 2020-03-31<br />value_daily:   1085","Date: 2020-04-01<br />value_daily:   1284","Date: 2020-04-02<br />value_daily:   1512","Date: 2020-04-03<br />value_daily:   1430","Date: 2020-04-04<br />value_daily:   1565","Date: 2020-04-05<br />value_daily:   1613","Date: 2020-04-06<br />value_daily:   1771","Date: 2020-04-07<br />value_daily:   2578","Date: 2020-04-08<br />value_daily:   2155","Date: 2020-04-09<br />value_daily:   2202","Date: 2020-04-10<br />value_daily:   2194","Date: 2020-04-11<br />value_daily:   2128","Date: 2020-04-12<br />value_daily:   1873","Date: 2020-04-13<br />value_daily:   2013","Date: 2020-04-14<br />value_daily:   2434","Date: 2020-04-15<br />value_daily:   2605","Date: 2020-04-16<br />value_daily:   2143","Date: 2020-04-17<br />value_daily:   2109","Date: 2020-04-18<br />value_daily:   1980","Date: 2020-04-19<br />value_daily:   1970","Date: 2020-04-20<br />value_daily:   2232","Date: 2020-04-21<br />value_daily:   2516","Date: 2020-04-22<br />value_daily:   2452","Date: 2020-04-23<br />value_daily:   2463","Date: 2020-04-24<br />value_daily:   2186","Date: 2020-04-25<br />value_daily:   1710","Date: 2020-04-26<br />value_daily:   1399","Date: 2020-04-27<br />value_daily:   1508","Date: 2020-04-28<br />value_daily:   2227","Date: 2020-04-29<br />value_daily:   2415","Date: 2020-04-30<br />value_daily:   2197","Date: 2020-05-01<br />value_daily:   1905","Date: 2020-05-02<br />value_daily:   1732","Date: 2020-05-03<br />value_daily:   1189","Date: 2020-05-04<br />value_daily:   1379","Date: 2020-05-05<br />value_daily:   2246","Date: 2020-05-06<br />value_daily:   2312","Date: 2020-05-07<br />value_daily:   1927","Date: 2020-05-08<br />value_daily:   1761","Date: 2020-05-09<br />value_daily:   1467","Date: 2020-05-10<br />value_daily:    976","Date: 2020-05-11<br />value_daily:   1043","Date: 2020-05-12<br />value_daily:   1600","Date: 2020-05-13<br />value_daily:   1738","Date: 2020-05-14<br />value_daily:   1787","Date: 2020-05-15<br />value_daily:   1670","Date: 2020-05-16<br />value_daily:   1199","Date: 2020-05-17<br />value_daily:    818","Date: 2020-05-18<br />value_daily:   1227","Date: 2020-05-19<br />value_daily:   1457","Date: 2020-05-20<br />value_daily:   1500","Date: 2020-05-21<br />value_daily:   1188","Date: 2020-05-22<br />value_daily:   1220","Date: 2020-05-23<br />value_daily:   1086","Date: 2020-05-24<br />value_daily:    637","Date: 2020-05-25<br />value_daily:    592","Date: 2020-05-26<br />value_daily:    677","Date: 2020-05-27<br />value_daily:   1462","Date: 2020-05-28<br />value_daily:   1107","Date: 2020-05-29<br />value_daily:   1133","Date: 2020-05-30<br />value_daily:    954","Date: 2020-05-31<br />value_daily:    613","Date: 2020-06-01<br />value_daily:    776","Date: 2020-06-02<br />value_daily:    981","Date: 2020-06-03<br />value_daily:   1011","Date: 2020-06-04<br />value_daily:   1011","Date: 2020-06-05<br />value_daily:    894","Date: 2020-06-06<br />value_daily:    643","Date: 2020-06-07<br />value_daily:    456","Date: 2020-06-08<br />value_daily:    507","Date: 2020-06-09<br />value_daily:    913","Date: 2020-06-10<br />value_daily:    873","Date: 2020-06-11<br />value_daily:    830","Date: 2020-06-12<br />value_daily:    829","Date: 2020-06-13<br />value_daily:    733","Date: 2020-06-14<br />value_daily:    342","Date: 2020-06-15<br />value_daily:    395","Date: 2020-06-16<br />value_daily:    814","Date: 2020-06-17<br />value_daily:    739","Date: 2020-06-18<br />value_daily:    690","Date: 2020-06-19<br />value_daily:    628","Date: 2020-06-20<br />value_daily:    562","Date: 2020-06-21<br />value_daily:    314","Date: 2020-06-22<br />value_daily:    408","Date: 2020-06-23<br />value_daily:    748","Date: 2020-06-24<br />value_daily:    748","Date: 2020-06-25<br />value_daily:    530","Date: 2020-06-26<br />value_daily:    626","Date: 2020-06-27<br />value_daily:    502","Date: 2020-06-28<br />value_daily:    319","Date: 2020-06-29<br />value_daily:    383","Date: 2020-06-30<br />value_daily:    557","Date: 2020-07-01<br />value_daily:    705","Date: 2020-07-02<br />value_daily:    716","Date: 2020-07-03<br />value_daily:    667","Date: 2020-07-04<br />value_daily:    306","Date: 2020-07-05<br />value_daily:    325","Date: 2020-07-06<br />value_daily:    376","Date: 2020-07-07<br />value_daily:   1163","Date: 2020-07-08<br />value_daily:    841","Date: 2020-07-09<br />value_daily:   1012","Date: 2020-07-10<br />value_daily:    806","Date: 2020-07-11<br />value_daily:    727","Date: 2020-07-12<br />value_daily:    472","Date: 2020-07-13<br />value_daily:    444","Date: 2020-07-14<br />value_daily:    929","Date: 2020-07-15<br />value_daily:    973","Date: 2020-07-16<br />value_daily:    955","Date: 2020-07-17<br />value_daily:    925","Date: 2020-07-18<br />value_daily:    869","Date: 2020-07-19<br />value_daily:    466","Date: 2020-07-20<br />value_daily:    563","Date: 2020-07-21<br />value_daily:   1094","Date: 2020-07-22<br />value_daily:   1223","Date: 2020-07-23<br />value_daily:   1086","Date: 2020-07-24<br />value_daily:   1100","Date: 2020-07-25<br />value_daily:    913","Date: 2020-07-26<br />value_daily:    534","Date: 2020-07-27<br />value_daily:   1120","Date: 2020-07-28<br />value_daily:   1341","Date: 2020-07-29<br />value_daily:   1427","Date: 2020-07-30<br />value_daily:   1226","Date: 2020-07-31<br />value_daily:   1217","Date: 2020-08-01<br />value_daily:   1094","Date: 2020-08-02<br />value_daily:    431","Date: 2020-08-03<br />value_daily:    579","Date: 2020-08-04<br />value_daily:   1340","Date: 2020-08-05<br />value_daily:   1397","Date: 2020-08-06<br />value_daily:   1238","Date: 2020-08-07<br />value_daily:   1232","Date: 2020-08-08<br />value_daily:   1075","Date: 2020-08-09<br />value_daily:    560","Date: 2020-08-10<br />value_daily:    588","Date: 2020-08-11<br />value_daily:   1020","Date: 2020-08-12<br />value_daily:   1503","Date: 2020-08-13<br />value_daily:   1062","Date: 2020-08-14<br />value_daily:   1340","Date: 2020-08-15<br />value_daily:   1004","Date: 2020-08-16<br />value_daily:    609","Date: 2020-08-17<br />value_daily:    491","Date: 2020-08-18<br />value_daily:   1273","Date: 2020-08-19<br />value_daily:   1300","Date: 2020-08-20<br />value_daily:   1093","Date: 2020-08-21<br />value_daily:   1083","Date: 2020-08-22<br />value_daily:    975","Date: 2020-08-23<br />value_daily:    496","Date: 2020-08-24<br />value_daily:    474","Date: 2020-08-25<br />value_daily:   1227","Date: 2020-08-26<br />value_daily:   1184","Date: 2020-08-27<br />value_daily:   1099","Date: 2020-08-28<br />value_daily:    958","Date: 2020-08-29<br />value_daily:    902","Date: 2020-08-30<br />value_daily:    465","Date: 2020-08-31<br />value_daily:    542","Date: 2020-09-01<br />value_daily:   1044","Date: 2020-09-02<br />value_daily:   1061","Date: 2020-09-03<br />value_daily:   1032","Date: 2020-09-04<br />value_daily:    950","Date: 2020-09-05<br />value_daily:    782","Date: 2020-09-06<br />value_daily:    444","Date: 2020-09-07<br />value_daily:    297","Date: 2020-09-08<br />value_daily:    455","Date: 2020-09-09<br />value_daily:   1150","Date: 2020-09-10<br />value_daily:    902","Date: 2020-09-11<br />value_daily:   1172","Date: 2020-09-12<br />value_daily:    723","Date: 2020-09-13<br />value_daily:    426","Date: 2020-09-14<br />value_daily:    438","Date: 2020-09-15<br />value_daily:   1202","Date: 2020-09-16<br />value_daily:    944","Date: 2020-09-17<br />value_daily:    866","Date: 2020-09-18<br />value_daily:    908","Date: 2020-09-19<br />value_daily:    722","Date: 2020-09-20<br />value_daily:    268","Date: 2020-09-21<br />value_daily:    428","Date: 2020-09-22<br />value_daily:   1029","Date: 2020-09-23<br />value_daily:   1055","Date: 2020-09-24<br />value_daily:    907","Date: 2020-09-25<br />value_daily:    928","Date: 2020-09-26<br />value_daily:    776","Date: 2020-09-27<br />value_daily:    316","Date: 2020-09-28<br />value_daily:    358","Date: 2020-09-29<br />value_daily:    860","Date: 2020-09-30<br />value_daily:    936","Date: 2020-10-01<br />value_daily:    867","Date: 2020-10-02<br />value_daily:    855","Date: 2020-10-03<br />value_daily:    681","Date: 2020-10-04<br />value_daily:    383","Date: 2020-10-05<br />value_daily:    481","Date: 2020-10-06<br />value_daily:    689","Date: 2020-10-07<br />value_daily:    920","Date: 2020-10-08<br />value_daily:    993","Date: 2020-10-09<br />value_daily:    968","Date: 2020-10-10<br />value_daily:    654","Date: 2020-10-11<br />value_daily:    468","Date: 2020-10-12<br />value_daily:    395","Date: 2020-10-13<br />value_daily:    794","Date: 2020-10-14<br />value_daily:    983","Date: 2020-10-15<br />value_daily:    858","Date: 2020-10-16<br />value_daily:    932","Date: 2020-10-17<br />value_daily:    769","Date: 2020-10-18<br />value_daily:    490","Date: 2020-10-19<br />value_daily:    478","Date: 2020-10-20<br />value_daily:    925","Date: 2020-10-21<br />value_daily:   1150","Date: 2020-10-22<br />value_daily:    889","Date: 2020-10-23<br />value_daily:    960","Date: 2020-10-24<br />value_daily:    952","Date: 2020-10-25<br />value_daily:    459","Date: 2020-10-26<br />value_daily:    533","Date: 2020-10-27<br />value_daily:    970","Date: 2020-10-28<br />value_daily:   1038","Date: 2020-10-29<br />value_daily:   1001","Date: 2020-10-30<br />value_daily:   1068","Date: 2020-10-31<br />value_daily:    908","Date: 2020-11-01<br />value_daily:    496","Date: 2020-11-02<br />value_daily:    573","Date: 2020-11-03<br />value_daily:   1578","Date: 2020-11-04<br />value_daily:   1122","Date: 2020-11-05<br />value_daily:   1149","Date: 2020-11-06<br />value_daily:   1233","Date: 2020-11-07<br />value_daily:   1077","Date: 2020-11-08<br />value_daily:    571","Date: 2020-11-09<br />value_daily:    779","Date: 2020-11-10<br />value_daily:   1418","Date: 2020-11-11<br />value_daily:   1436","Date: 2020-11-12<br />value_daily:   1203","Date: 2020-11-13<br />value_daily:   1200","Date: 2020-11-14<br />value_daily:   1346","Date: 2020-11-15<br />value_daily:    775","Date: 2020-11-16<br />value_daily:    829","Date: 2020-11-17<br />value_daily:   1719","Date: 2020-11-18<br />value_daily:   1936","Date: 2020-11-19<br />value_daily:   2040","Date: 2020-11-20<br />value_daily:   1948","Date: 2020-11-21<br />value_daily:   1615","Date: 2020-11-22<br />value_daily:   1032","Date: 2020-11-23<br />value_daily:   1097","Date: 2020-11-24<br />value_daily:   2129","Date: 2020-11-25<br />value_daily:   2259","Date: 2020-11-26<br />value_daily:   1385","Date: 2020-11-27<br />value_daily:   1550","Date: 2020-11-28<br />value_daily:   1359","Date: 2020-11-29<br />value_daily:   1036","Date: 2020-11-30<br />value_daily:   1346","Date: 2020-12-01<br />value_daily:   2547","Date: 2020-12-02<br />value_daily:   2819","Date: 2020-12-03<br />value_daily:   2950","Date: 2020-12-04<br />value_daily:   2677","Date: 2020-12-05<br />value_daily:   2345","Date: 2020-12-06<br />value_daily:   1352","Date: 2020-12-07<br />value_daily:   1614","Date: 2020-12-08<br />value_daily:   2627","Date: 2020-12-09<br />value_daily:   3177","Date: 2020-12-10<br />value_daily:   2992","Date: 2020-12-11<br />value_daily:   3415","Date: 2020-12-12<br />value_daily:   2456","Date: 2020-12-13<br />value_daily:   1626","Date: 2020-12-14<br />value_daily:   1656","Date: 2020-12-15<br />value_daily:   3101","Date: 2020-12-16<br />value_daily:   3721","Date: 2020-12-17<br />value_daily:   3465","Date: 2020-12-18<br />value_daily:   2942","Date: 2020-12-19<br />value_daily:   2651","Date: 2020-12-20<br />value_daily:   1711","Date: 2020-12-21<br />value_daily:   1938","Date: 2020-12-22<br />value_daily:   3392","Date: 2020-12-23<br />value_daily:   3419","Date: 2020-12-24<br />value_daily:   2910","Date: 2020-12-25<br />value_daily:   1400","Date: 2020-12-26<br />value_daily:   1879","Date: 2020-12-27<br />value_daily:   1430","Date: 2020-12-28<br />value_daily:   2003","Date: 2020-12-29<br />value_daily:   3629","Date: 2020-12-30<br />value_daily:   3729","Date: 2020-12-31<br />value_daily:   3447","Date: 2021-01-01<br />value_daily:   2154","Date: 2021-01-02<br />value_daily:   2503","Date: 2021-01-03<br />value_daily:   1441","Date: 2021-01-04<br />value_daily:   2098","Date: 2021-01-05<br />value_daily:   3691","Date: 2021-01-06<br />value_daily:   3929","Date: 2021-01-07<br />value_daily:   3966","Date: 2021-01-08<br />value_daily:   4091","Date: 2021-01-09<br />value_daily:   3334","Date: 2021-01-10<br />value_daily:   1999","Date: 2021-01-11<br />value_daily:   2096","Date: 2021-01-12<br />value_daily:   4476","Date: 2021-01-13<br />value_daily:   4027","Date: 2021-01-14<br />value_daily:   3973","Date: 2021-01-15<br />value_daily:   3898","Date: 2021-01-16<br />value_daily:   3428","Date: 2021-01-17<br />value_daily:   1868","Date: 2021-01-18<br />value_daily:   1514","Date: 2021-01-19<br />value_daily:   2731","Date: 2021-01-20<br />value_daily:   4406","Date: 2021-01-21<br />value_daily:   4181","Date: 2021-01-22<br />value_daily:   3833","Date: 2021-01-23<br />value_daily:   3343","Date: 2021-01-24<br />value_daily:   1898","Date: 2021-01-25<br />value_daily:   1971","Date: 2021-01-26<br />value_daily:   4033","Date: 2021-01-27<br />value_daily:   3954","Date: 2021-01-28<br />value_daily:   4026","Date: 2021-01-29<br />value_daily:   3613","Date: 2021-01-30<br />value_daily:   2770","Date: 2021-01-31<br />value_daily:   1841","Date: 2021-02-01<br />value_daily:   2048","Date: 2021-02-02<br />value_daily:   3474","Date: 2021-02-03<br />value_daily:   3881","Date: 2021-02-04<br />value_daily:   3744","Date: 2021-02-05<br />value_daily:   3623","Date: 2021-02-06<br />value_daily:   2600","Date: 2021-02-07<br />value_daily:   1367","Date: 2021-02-08<br />value_daily:   1607","Date: 2021-02-09<br />value_daily:   3074","Date: 2021-02-10<br />value_daily:   3325","Date: 2021-02-11<br />value_daily:   3179","Date: 2021-02-12<br />value_daily:   2915","Date: 2021-02-13<br />value_daily:   2189","Date: 2021-02-14<br />value_daily:   1128","Date: 2021-02-15<br />value_daily:    951","Date: 2021-02-16<br />value_daily:   1730","Date: 2021-02-17<br />value_daily:   2408","Date: 2021-02-18<br />value_daily:   2474","Date: 2021-02-19<br />value_daily:   2652","Date: 2021-02-20<br />value_daily:   1799","Date: 2021-02-21<br />value_daily:   1214","Date: 2021-02-22<br />value_daily:   1299","Date: 2021-02-23<br />value_daily:   2271","Date: 2021-02-24<br />value_daily:   3172","Date: 2021-02-25<br />value_daily:   2365","Date: 2021-02-26<br />value_daily:   2107","Date: 2021-02-27<br />value_daily:   1507","Date: 2021-02-28<br />value_daily:   1059","Date: 2021-03-01<br />value_daily:   1536","Date: 2021-03-02<br />value_daily:   1946","Date: 2021-03-03<br />value_daily:   2494","Date: 2021-03-04<br />value_daily:   1935","Date: 2021-03-05<br />value_daily:   1781","Date: 2021-03-06<br />value_daily:   1503","Date: 2021-03-07<br />value_daily:    686","Date: 2021-03-08<br />value_daily:    740","Date: 2021-03-09<br />value_daily:   1801","Date: 2021-03-10<br />value_daily:   1570","Date: 2021-03-11<br />value_daily:   1564","Date: 2021-03-12<br />value_daily:   1573","Date: 2021-03-13<br />value_daily:   1737","Date: 2021-03-14<br />value_daily:    579","Date: 2021-03-15<br />value_daily:    747","Date: 2021-03-16<br />value_daily:   1161","Date: 2021-03-17<br />value_daily:   1182","Date: 2021-03-18<br />value_daily:   1620","Date: 2021-03-19<br />value_daily:   1097","Date: 2021-03-20<br />value_daily:    779","Date: 2021-03-21<br />value_daily:    448","Date: 2021-03-22<br />value_daily:    562","Date: 2021-03-23<br />value_daily:    848","Date: 2021-03-24<br />value_daily:   1456","Date: 2021-03-25<br />value_daily:   1559","Date: 2021-03-26<br />value_daily:   1121","Date: 2021-03-27<br />value_daily:    741","Date: 2021-03-28<br />value_daily:    507","Date: 2021-03-29<br />value_daily:    701","Date: 2021-03-30<br />value_daily:    875","Date: 2021-03-31<br />value_daily:   1076","Date: 2021-04-01<br />value_daily:   1064"],"type":"bar","marker":{"autocolorscale":false,"color":"rgba(89,89,89,1)","line":{"width":1.88976377952756,"color":"rgba(0,88,171,1)"}},"showlegend":false,"xaxis":"x","yaxis":"y2","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":37.4307458143075,"r":7.30593607305936,"b":25.0837138508371,"l":46.027397260274},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18262.025,18739.975],"tickmode":"array","ticktext":["2020-04","2020-07","2020-10","2021-01","2021-04"],"tickvals":[18353,18444,18536,18628,18718],"categoryorder":"array","categoryarray":["2020-04","2020-07","2020-10","2021-01","2021-04"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y2","title":"","hoverformat":".2f"},"yaxis":{"domain":[0.512366818873668,1],"automargin":true,"type":"linear","autorange":false,"range":[0,300295],"tickmode":"array","ticktext":["0","50000","100000","150000","200000","250000","300000"],"tickvals":[0,50000,100000,150000,200000,250000,300000],"categoryorder":"array","categoryarray":["0","50000","100000","150000","200000","250000","300000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":"","hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0.512366818873668,"y1":1},{"type":"rect","fillcolor":"rgba(255,255,255,1)","line":{"color":"rgba(0,0,0,1)","width":1.32835201328352,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":23.37899543379,"yanchor":1,"ysizemode":"pixel"},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":0.487633181126332},{"type":"rect","fillcolor":"rgba(255,255,255,1)","line":{"color":"rgba(0,0,0,1)","width":1.32835201328352,"linetype":"solid"},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":23.37899543379,"yanchor":0.487633181126332,"ysizemode":"pixel"}],"annotations":[{"text":"Cases","x":0.5,"y":1,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.689497716895},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"},{"text":"Deaths","x":0.5,"y":0.487633181126332,"showarrow":false,"ax":0,"ay":0,"font":{"color":"rgba(26,26,26,1)","family":"","size":11.689497716895},"xref":"paper","yref":"paper","textangle":-0,"xanchor":"center","yanchor":"bottom"}],"yaxis2":{"type":"linear","autorange":false,"range":[0,4476],"tickmode":"array","ticktext":["0","1000","2000","3000","4000"],"tickvals":[0,1000,2000,3000,4000],"categoryorder":"array","categoryarray":["0","1000","2000","3000","4000"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176,"showgrid":false,"domain":[0,0.487633181126332],"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":"","hoverformat":".2f"},"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"28ac1d3966b9":{"x":{},"y":{},"type":"bar"}},"cur_data":"28ac1d3966b9","visdat":{"28ac1d3966b9":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 </div>
 <div id="data-from-coverage-db" class="section level3">
 <h3>Data from COVerAGE-DB</h3>
-<p><strong>The COVerAGE-DB dataset for Pakistan was most recently updated on 2020-05-31</strong></p>
+<p><strong>The COVerAGE-DB dataset for United States of America was most recently updated on 2021-03-02</strong></p>
 <p>Table 1.a. The cases and deaths reported by Johns Hopkins University (JHU) and extracted from the COVerAGE-DB database. The fourth column (COVerAGE-DB/JHU) shows the ratio of case and death counts from COVerAGE-DB to those reported by JHU. The harmonized data of age groups 0-4, 5-9, 10-14, 15-19 are listed in the table. Their counts sum to age group 0-19 and the percentage values show this age group’s proportion in all age groups.</p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
@@ -359,65 +326,65 @@ Age 0-19
 <tbody>
 <tr>
 <td style="text-align:left;">
-Pakistan
+United States of America
 </td>
 <td style="text-align:left;">
 Cases
 </td>
 <td style="text-align:right;">
-588728
+30539868
 </td>
 <td style="text-align:right;">
-14
+93
 </td>
 <td style="text-align:right;">
-NA
+559241
 </td>
 <td style="text-align:right;">
-NA
+721345
 </td>
 <td style="text-align:right;">
-741
+1064843
 </td>
 <td style="text-align:right;">
-5502
+1710881
 </td>
 <td style="text-align:left;">
-6,243 (8%)
+4,056,310 (14%)
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Pakistan
+United States of America
 </td>
 <td style="text-align:left;">
 Deaths
 </td>
 <td style="text-align:right;">
-13166
+553136
 </td>
 <td style="text-align:right;">
-13
+95
 </td>
 <td style="text-align:right;">
-NA
+83
 </td>
 <td style="text-align:right;">
-NA
+35
 </td>
 <td style="text-align:right;">
-4
+52
 </td>
 <td style="text-align:right;">
-9
+191
 </td>
 <td style="text-align:left;">
-13 (0.8%)
+361 (0.1%)
 </td>
 </tr>
 </tbody>
 </table>
-Table 1.b. Counts of COVID-19 cases and deaths by sex from COVerAGE-DB. The harmonized data for age groups 0-4, 5-9, 10-14, 15-19 and 0-19 as well as the proportion of age group 0-19 are shown in the table.
+<p>Table 1.b. Counts of COVID-19 cases and deaths by sex from COVerAGE-DB. The harmonized data for age groups 0-4, 5-9, 10-14, 15-19 and 0-19 as well as the proportion of age group 0-19 are shown in the table.</p>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -453,16 +420,13 @@ Age 0-19
 <tbody>
 <tr>
 <td style="text-align:left;">
-Pakistan
+United States of America
 </td>
 <td style="text-align:left;">
 Cases
 </td>
 <td style="text-align:left;">
-Both
-</td>
-<td style="text-align:right;">
-14
+Female
 </td>
 <td style="text-align:right;">
 NA
@@ -471,42 +435,103 @@ NA
 NA
 </td>
 <td style="text-align:right;">
-741
+NA
 </td>
 <td style="text-align:right;">
-5502
+NA
+</td>
+<td style="text-align:right;">
+NA
 </td>
 <td style="text-align:left;">
-6,243 (8%)
+NA (NA%)
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Pakistan
+United States of America
+</td>
+<td style="text-align:left;">
+Cases
+</td>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA (NA%)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+United States of America
 </td>
 <td style="text-align:left;">
 Deaths
 </td>
 <td style="text-align:left;">
-Both
-</td>
-<td style="text-align:right;">
-13
+Female
 </td>
 <td style="text-align:right;">
 NA
 </td>
 <td style="text-align:right;">
-NA
+31
 </td>
 <td style="text-align:right;">
-4
+16
 </td>
 <td style="text-align:right;">
-9
+24
+</td>
+<td style="text-align:right;">
+82
 </td>
 <td style="text-align:left;">
-13 (0.8%)
+153 (0.1%)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+United States of America
+</td>
+<td style="text-align:left;">
+Deaths
+</td>
+<td style="text-align:left;">
+Male
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+52
+</td>
+<td style="text-align:right;">
+20
+</td>
+<td style="text-align:right;">
+28
+</td>
+<td style="text-align:right;">
+109
+</td>
+<td style="text-align:left;">
+209 (0.1%)
 </td>
 </tr>
 </tbody>
@@ -548,7 +573,7 @@ $(document).ready(function () {
 
 $(document).ready(function () {
   $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
+    $(this).parent().toggleClass('nav-tabs-open');
   });
 });
 </script>

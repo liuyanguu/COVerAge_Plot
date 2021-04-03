@@ -292,18 +292,28 @@ get.data.CFR <- function(data_both, Exact_Match = FALSE){
 #' country-specific plot, showing Cases, Deaths, and CFR 
 #' whichever is available, showing sex-specific if available
 #'
+#' @param iso3 country iso
 #' @param cname0 country name
 #' @param CFR_alone option to make CFR plot alone
 #' @param dt1 dataset
 #' @param return_CFR_data 
 make_country_plot <- function(
+  iso3 = NULL, 
   cname0, 
   dt1,
   CFR_alone = FALSE, 
   return_CFR_data = FALSE
   ){
-  dt2 <- dt1[Country==cname0 & Age!="TOT"]
-  latest.date <- max(dt2$Date, na.rm = TRUE)
+  
+  if(is.null(iso3)){
+    dt2 <- dt1[Country==cname0 & Age!="TOT"]
+    
+  } else {
+    dt2 <- dt1[ISO3Code==iso3 & Age!="TOT"]
+    cname0 <- dt1[ISO3Code==iso3, Country[1]]
+  }
+
+  latest.date <- dt2$max_date[1]
   avail_mea <- sort(unique(dt2[Value!=0, Measure]))
   if(length(avail_mea)==0) {
     message(cname0, "-Measures-", "All values are 0, not plotted", "\n")
