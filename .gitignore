@@ -13,3 +13,6 @@ data_raw
 NaturalEarth
 old
 backup
+inputDB.csv
+docs/inputDB.csv
+docs/data_backup

@@ -334,6 +334,8 @@ get.JHU.daily <- function(){
   url0 <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/"
   url_daily_report <- paste0(url0, as.character(date1) ,".csv")
   
+  if(!dir.exists("data_backup/JHU")) dir.create("data_backup/JHU", recursive = TRUE)
+  
   tryCatch({
     dt_JHU <- fread(input = url_daily_report);
     fwrite(dt_JHU, paste0("data_backup/JHU/JHU_daily_report_", Sys.Date()-1,".csv"))

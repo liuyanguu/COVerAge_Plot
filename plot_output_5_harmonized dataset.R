@@ -19,7 +19,7 @@ dt5 <- clean_outputDB(dt5_ori)
 all_countries <- get_cnames(dt5)
 cname0 <- all_countries[1]
 cname0 <- "Nepal"
-p1 <- make_country_plot(cname0, dt1 = dt5)
+p1 <- make_country_plot(cname0 = cname0, dt1 = dt5)
 if(!dir.exists("fig_harmonized5/country/")) dir.create("fig_harmonized5/country", recursive = TRUE)
 ggsave(p1, filename = paste0("fig_harmonized5/country/", cname0, ".png"), width = 11, height = 4)
 

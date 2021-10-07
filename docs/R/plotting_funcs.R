@@ -298,9 +298,9 @@ get.data.CFR <- function(data_both, Exact_Match = FALSE){
 #' @param dt1 dataset
 #' @param return_CFR_data 
 make_country_plot <- function(
-  iso3 = NULL, 
   cname0, 
   dt1,
+  iso3 = NULL, 
   CFR_alone = FALSE, 
   return_CFR_data = FALSE
   ){
@@ -534,7 +534,7 @@ calculate.CFR <- function(data_total, age_groups = c(0,5,10,15)){
 
 plot_aggregated_total <- function(data_total, by_sex = FALSE, big_plot = FALSE){
   # further aggregated by country 
-  data_total <- revise.data.total(data_total1)
+  data_total <- revise.data.total(data_total)
     # titles, etc
   total_title <- paste0("Aggregated results of ", data_total$n_country[1], " countries")
   total_title <- paste(total_title, if(by_sex) "by sex")
@@ -584,7 +584,7 @@ plot_aggregated_total_wrap <- function(
   ggsave(filename = filename0,
         g_grid, 
          # save each 3-panel plot as 11*4
-         width = 11*n_col0, 
+         width = 11*n_row0, 
          height = 4/n_col0*length(g_list), 
          limitsize = FALSE)
   

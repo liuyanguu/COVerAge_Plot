@@ -11,29 +11,35 @@ suppressPackageStartupMessages({
 source("R/plotting_funcs.R")
 source("R/00_Functions_convert_to_count.R")
 
+
 # download input.DB as zip file and read in 
-inputDB <- refresh_data() # re-download and calculate fraction into numbers 
-# 
-inputDB[, table(Metric)]
-inputDB[, table(Measure)] # ASCFR  Cases Deaths  Tests
-dt1 <- clean_inputDB(inputDB = inputDB)
+# Warning: this step is very slow
+# inputDB <- refresh_data() # re-download and calculate fraction into numbers 
+# # 
+# inputDB[, table(Metric)]
+# inputDB[, table(Measure)] # ASCFR  Cases Deaths  Tests
+# dt1 <- clean_inputDB(inputDB = inputDB)
+# fwrite(dt1, "data_backup/dt1_input_cleaned.csv")
+
+dt1 <- fread("data_backup/dt1_input_cleaned.csv")
 all_countries <- get_cnames(dt1)
 
 # country-specific plot ---- 
 # three plots for each country showing Cases, Deaths, and CFR (Death/Case) 
 # whichever is available, showing sex-specific if available
 cname0 <- all_countries[1]
-p1 <- make_country_plot(cname0, dt1 = dt1)
+p1 <- make_country_plot(cname0 = cname0, dt1 = dt1)
 
 if(!dir.exists("fig/country/")) dir.create("fig/country", recursive = TRUE)
 ggsave(p1, filename = paste0("fig/country/", cname0, ".png"), width = 11, height = 4)
 
 # a wrapped function to save a group of countries by supplying country names, results will be saved as one pdf or png file  
 save_country_plot_in_one(cnames = all_countries, png_or_pdf = "pdf", dt1 = dt1)
-save_country_plot_in_one(cnames = all_countries, png_or_pdf = "png", dt1 = dt1)
+# save_country_plot_in_one(cnames = all_countries, png_or_pdf = "png", dt1 = dt1)
 
 # If needed, can save CFR (Death/Case) alone
 # p2 <- make_country_plot(cname0, CFR_alone = TRUE)
+
 
 # aggregated plots for all countries ---- 
 # only choose those that has both case and death data and can calculate CFR

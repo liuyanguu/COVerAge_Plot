@@ -75,7 +75,7 @@ cname0 <- dt5_country[ISO3Code == iso0, Country[1]]
 
 Johns Hopkins University (JHU) data refer to the daily-updated data used for their dashboard. The dataset was downloaded from the [project page](https://github.com/CSSEGISandData/COVID-19).
 
-COVerAGE-DB, led by the Max Planck Institute, is an open-access database including cumulative counts of confirmed COVID-19 cases, deaths, and tests by age and sex. Original data and sources are provided alongside data and measures in standardized and age-harmonized formats. The data were extracted from reports published by official governmental institutions in a variety of formats. The [project page](https://github.com/timriffe/covid_age) and the [medRxiv paper](https://www.medrxiv.org/content/10.1101/2020.09.18.20197228v2) contain the technical details. The database is still in development. Today it includes `r dt5_ori[, uniqueN(Country)]` countries and `r dt5_ori[Region!="All", uniqueN(Region)]` subnational areas.
+COVerAGE-DB, led by the Max Planck Institute, is an open-access database including cumulative counts of confirmed COVID-19 cases, deaths, and tests by age and sex. Original data and sources are provided alongside data and measures in standardized and age-harmonized formats. The data were extracted from reports published by official governmental institutions in a variety of formats. The [project page](https://github.com/timriffe/covid_age) and the [medRxiv paper](https://www.medrxiv.org/content/10.1101/2020.09.18.20197228v2) contain the technical details. The database is still in development. On `r Sys.Date()` it includes `r dt5_ori[, uniqueN(Country)]` countries and `r dt5_ori[Region!="All", uniqueN(Region)]` subnational areas.
 
 ## `r cname0`
 
