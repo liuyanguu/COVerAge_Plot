@@ -55,6 +55,3 @@ data_total1 <- rbindlist(lapply(all_countries, get_dt_for_total,
 # a three-panel plot (Case, Death, CFR) for a specific given interval
 g1 <- plot_aggregated_total(data_total1)
 ```
-
-![Aggregated_plot_0to60_by10_2rows](fig/aggregated/Aggregated_plot_0to60_by10_2rows.png)
-
