@@ -2,10 +2,12 @@
 
 
 
-# 1. Data Source: MPIDR - Tim Riffe ---- 
+# 1. Data Source: MPIDR --- COVerAGE database
 # Max Planck Institute for Demographic Research (MPIDR)
 # https://github.com/timriffe/covid_age
+
 #' Get Data host on OSF: https://osf.io/mpwjq/
+#' 
 get_MPIDR_inputDB <- function(){
   # the raw data on OSF: https://osf.io/mpwjq/
   # link updated 9/10/2020
@@ -392,25 +394,45 @@ make_country_plot <- function(
 }
 
 
-#' save several countries in one plot using `ggsave
-#' a simple function for user's convenience
+#' save several countries in one file using `ggsave`
+#' a simple wrapping function for user's convenience
+#' 
 save_country_plot_in_one <- function(
   dt1,
   cnames, # a vector of countries
   n_col0 = 2, # two countries per row
   file_name = "fig/MPIDR_Countries_wCFR",
-  png_or_pdf = "pdf"
+  png_or_pdf = "pdf",
+  png_country_limit = 20
 ){
-  require("cowplot")
-  g_country_list <- lapply(cnames, make_country_plot, dt1 = dt1)
-  g_grid <- cowplot::plot_grid(plotlist = g_country_list, ncol = n_col0)
-  # height = 4 for each row 
-  ggsave(filename = paste0(file_name, ".", png_or_pdf), 
-         device = png_or_pdf,
-         plot = g_grid, 
-         width = 22, 
-         height = 4/n_col0*length(g_country_list), 
-         limitsize = FALSE)
+  require("gridExtra")
+  
+  plist <- lapply(cnames, make_country_plot, dt1 = dt1)
+  plist <- plist[!sapply(plist, is.null)]
+  plist <- lapply(plist, ggplotGrob)
+  
+  # each plot is 11 * 4
+  if(png_or_pdf == "pdf"){
+    g_grid <- gridExtra::marrangeGrob(grobs = plist, ncol = n_col0, nrow = 3)
+    ggsave(filename = paste0(file_name, ".", png_or_pdf), 
+           device = png_or_pdf,
+           plot = g_grid, width = 11*n_col0, height = 12, 
+           limitsize = FALSE)
+    
+  } else {
+    if(length(plist)>20){
+      message("Suggest to save as pdf, only plot in png first ", png_country_limit, " countries.")
+      plist <- plist[1:png_country_limit]
+    }
+    g_grid <- gridExtra::marrangeGrob(grobs = plist, ncol = n_col0, nrow = ceiling(length(plist)/n_col0))
+    # height = 4 for each row 
+    ggsave(filename = paste0(file_name, ".", png_or_pdf), 
+           device = png_or_pdf,
+           plot = g_grid, 
+           width = 22, 
+           height = ceiling(length(plist)/n_col0) * 4)
+  }
+  message("Plot saved as: ", paste0(file_name, ".", png_or_pdf))
 }
 
 
@@ -573,21 +595,19 @@ plot_aggregated_total_wrap <- function(
                                   get_f_m = TRUE))
   g_list1 <- plot_aggregated_total(data_total1)
   g_list2 <- plot_aggregated_total(data_total2, by_sex = TRUE)
-  g_list <- c(g_list1, g_list2)
-  n_col0 <- ifelse(one_row, 2, 1)
-  n_row0 <- ifelse(one_row, 1, 2)
-  g_grid <- cowplot::plot_grid(plotlist = g_list, ncol = n_col0)
+  n_row0 <- if(one_row) 1 else 2
+  n_col0 <- 2 / n_row0
+  g_grid <- cowplot::plot_grid(g_list1, g_list2, ncol = n_col0)
   # height = 4 for each row 
   if(!dir.exists(folder)) dir.create(folder, recursive = TRUE)
   filename0 <- file.path(folder, paste0("Aggregated_plot_0to", max_interval, "_by", by_interval,"_", n_row0, "rows", ".png"))
-  message(filename0)
   ggsave(filename = filename0,
-        g_grid, 
-         # save each 3-panel plot as 11*4
-         width = 11*n_row0, 
-         height = 4/n_col0*length(g_list), 
-         limitsize = FALSE)
+         plot = g_grid, 
+         width = 22, 
+         height = n_row0 * 6
+         )
   
-  return(g_list)
+  message("plot saved as: ", filename0)
+  return(invisible())
 }
 

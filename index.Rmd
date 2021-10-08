@@ -25,8 +25,9 @@ geo_df <- readRDS(here::here("data/WorldRobinson_df.rds"))
 dtJHU <- get.JHU.daily()
 dtJHU2 <- process_dtJHU(dtJHU)
 
+# download input.DB as zip file and read in 
 # `load_fresh` will save a local copy
-# dt5_ori <- load_fresh(backup = TRUE)
+dt5_ori <- load_fresh(backup = TRUE)
 dt5_ori <- fread(here::here("data_backup/dt5_ori.csv"))
 dt5 <- clean_outputDB(dt5_ori) # dt5 has only latest day 
 countries_w_new_update <- dt5[Date>"2020-10-01", unique(Country)]

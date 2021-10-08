@@ -4,10 +4,17 @@
 
 ## Plots using the harmonized dataset (`Output_5.zip`)
 
-The [Github page](https://liuyanguu.github.io/COVerAge_Plot/index.html) (updated in October 2021) shows the plots based on the 5-year age interval harmonized datasets from COVerAGE-DB
+The [Github page](https://liuyanguu.github.io/COVerAge_Plot/index.html) (updated in October 2021) shows the aggregated plots for global cases and deaths based on the 5-year age interval harmonized datasets from COVerAGE-DB
 The pages are rendered from the `.Rmd` files.
 
+**Age distribution of global COVID-19 cases and deaths**
+![Total](docs/index_files/figure-html/unnamed-chunk-4-1.png)
 
+  
+**Age distribution of global COVID-19 cases and deaths by sex**
+![BySex](docs/index_files/figure-html/unnamed-chunk-5-1.png)
+  
+  
 ## Plots using the raw input dataset (`inputDB.zip`)
 Notice that it's harder to work on the input database directly now since it is quite large (\~1.5GB). The cleaning step might take an hour.
 
@@ -47,11 +54,13 @@ p1 <- make_country_plot(cname0)
 -   Fewer countries will be included if set a stricter/narrower interval, or set `get_f_m = TRUE` to ask for sex-specific data
 
 ```{r}
-# this example shows the countries available with 0 to 60 by 10 years age intervals
+# this example shows the countries available with 0 to 80 by 10 years age intervals
 data_total1 <- rbindlist(lapply(all_countries, get_dt_for_total, 
                                 data = dt1,
-                                target_interval = seq(0, 60, by = 10),
+                                target_interval = seq(0, 80, by = 10),
                                 get_f_m = TRUE))
 # a three-panel plot (Case, Death, CFR) for a specific given interval
 g1 <- plot_aggregated_total(data_total1)
 ```
+
+![Aggregated](fig/aggregated/Aggregated_plot_0to80_by10_1rows.png)

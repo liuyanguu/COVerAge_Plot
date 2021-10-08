@@ -22,8 +22,8 @@ suppressPackageStartupMessages({
 invisible(lapply(list.files(here::here("R"), full.names = TRUE), source))
 
 # download input.DB as zip file and read in 
-# dt5_ori <- download_covid(data = "Output_5", temp = TRUE,
-#                           verbose = FALSE, progress = FALSE, return = "data.table")
+# `load_fresh` will save a local copy
+dt5_ori <- load_fresh(backup = TRUE)
 dt5_ori <- fread(here::here("data_backup/dt5_ori.csv"))
 dt5 <- clean_outputDB(dt5_ori)
 countries_w_new_update <- dt5[Date>"2020-10-01", unique(Country)]

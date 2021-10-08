@@ -13,7 +13,8 @@ source("R/00_Functions_convert_to_count.R")
 
 
 # download input.DB as zip file and read in 
-# Warning: this step is very slow
+# Warning: this step is very slow (here I saved it when done with the cleaning)
+
 # inputDB <- refresh_data() # re-download and calculate fraction into numbers 
 # # 
 # inputDB[, table(Metric)]
@@ -38,7 +39,7 @@ save_country_plot_in_one(cnames = all_countries, png_or_pdf = "pdf", dt1 = dt1)
 # save_country_plot_in_one(cnames = all_countries, png_or_pdf = "png", dt1 = dt1)
 
 # If needed, can save CFR (Death/Case) alone
-# p2 <- make_country_plot(cname0, CFR_alone = TRUE)
+p2 <- make_country_plot(cname0 = cname0, dt1 = dt1, CFR_alone = TRUE)
 
 
 # aggregated plots for all countries ---- 
