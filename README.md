@@ -63,4 +63,4 @@ data_total1 <- rbindlist(lapply(all_countries, get_dt_for_total,
 g1 <- plot_aggregated_total(data_total1)
 ```
 
-![Aggregated](fig/aggregated/Aggregated_plot_0to80_by10_1rows.png)
+![Aggregated](fig/aggregated/Aggregated_plot_0to80_by10_2rows.png)
