@@ -53,8 +53,8 @@ data_total1 <- rbindlist(lapply(all_countries, get_dt_for_total,
 # a three-panel plot (Case, Death, CFR) for a specific given interval
 g1 <- plot_aggregated_total(data_total1)
 
-# a wrapped function to plot and save:
-# return list of figures, and save using ggsave in the same time 
+# a wrapped function to plot and save regional aggregates by different (combined) age interval:
+# return list of figures, and save using `ggsave` in the same time 
 g_list <- plot_aggregated_total_wrap(
   data = dt1, 
   max_interval = 60, 
@@ -71,15 +71,3 @@ g_total <- Map(plot_aggregated_total_wrap,
 g_total <- Map(plot_aggregated_total_wrap, 
                max_interval = c(60, 60, 80, 80), by_interval = c(10, 20, 10, 20),
                one_row = TRUE)
-
-# all the aggregated plots together
-g_grid1 <- cowplot::plot_grid(plotlist = g_total, ncol = 1)
-Ref0 <- paste0("\nReference: Riffe, T., Acosta, E, et. al. (2020, July 21). COVerAGE-DB: A database of COVID-19 cases and deaths by age. https://doi.org/10.17605/OSF.IO/MPWJQ. Dataset downloaded on ", dt1$Download_Date[1])
-Reference <- cowplot::ggdraw() + 
-  draw_label(Ref0, x = 0, hjust = 0) + 
-  theme(plot.margin = margin(1, 1, 1, 7))
-g_grid_wref <- cowplot::plot_grid(g_grid1, Reference, ncol = 1,
-                                  rel_heights = c(1, 0.05))
-ggsave(paste0("fig/MPIDR_aggregated",".png"), g_grid_wref, width = 24, height = 4*length(g_total), limitsize = FALSE)
-ggsave(paste0("fig/MPIDR_aggregated",".pdf"), g_grid_wref, width = 24, height = 4*length(g_total), limitsize = FALSE)
-

@@ -69,21 +69,28 @@ refresh_data <- function(save_locally = FALSE){
 #' 4. Remove multiple Code if any (e.g. UK)
 #' @param inputDB the dataset downloaded using \code{\link{refresh_data()}}
 #' 
-clean_inputDB <- function(inputDB){
+clean_inputDB <- function(
+  inputDB,
+  filter_max_day = TRUE # keep only the latest date 
+){
   # apply timriffe's step 1 of Processing steps: If Metric is "Fraction", distribute totals to produce counts by age and/or sex.
   # Ref: https://timriffe.github.io/covid_age/DataSteps.html
-  dt1 <- convert_to_count(inputDB)
-  setDT(dt1)
+  # dt1 <- convert_to_count(inputDB)
+  # setDT(dt1)
+  # fwrite(dt1, "data_backup/inputDB_convert_to_count.csv")
+  dt1 <- copy(inputDB)
   dt1 <- dt1[Metric == "Count" & Measure%in%c("ASCFR", "Cases", "Deaths") & Region == "All"]
   dt1[, Value:=round(Value)] # since the calculated count could have decimal
   # latest date by Measure, Country, Sex
   dt1[, max_date:= max(Date), by = .(Measure, Country, Sex)]
-  dt1 <- dt1[Date==max_date]
-  dt1[, max_date:=NULL]
+  
+  if(filter_max_day){
+    dt1 <- dt1[Date==max_date]
+  }
   # UK has multiple Code, remove duplication
-  dt1[,Code1 := Code[1], by = .(Measure, Country, Sex)]
-  dt1 <- dt1[Code==Code1]
-  dt1[, Code1:= NULL]
+  # dt1[,Code1 := Code[1], by = .(Measure, Country, Sex)]
+  # dt1 <- dt1[Code==Code1]
+  # dt1[, Code1:= NULL]
   dt1$Sex <- as.factor(dt1$Sex)
   levels(dt1$Sex) <- c("Both", "Female", "Male", "Unknown")
   # as a reference: available measure and sex by country
