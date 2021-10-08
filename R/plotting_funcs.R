@@ -611,7 +611,7 @@ plot_aggregated_total_wrap <- function(
   ggsave(filename = filename0,
          plot = g_grid, 
          width = 22, 
-         height = n_row0 * 6
+         height = n_row0 * 8
          )
   
   message("plot saved as: ", filename0)
