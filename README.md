@@ -4,7 +4,7 @@
 
 ## Plots using the harmonized dataset (`Output_5.zip`)
 
-The [Github page](https://liuyanguu.github.io/COVerAge_Plot/index.html) (updated in October 2021) shows the aggregated plots for global cases and deaths based on the 5-year age interval harmonized datasets from COVerAGE-DB
+The [Github page](https://liuyanguu.github.io/COVerAge_Plot/index.html) (updated in February 2022) shows the aggregated plots for global cases and deaths based on the 5-year age interval harmonized datasets from COVerAGE-DB
 The pages are rendered from the `.Rmd` files.
 
 **Age distribution of global COVID-19 cases and deaths**

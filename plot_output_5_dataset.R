@@ -14,6 +14,7 @@ invisible(lapply(list.files(here::here("R"), full.names = TRUE), source))
 dt5_ori <- load_fresh(backup = TRUE)
 dt5_ori <- fread(here::here("data_backup/dt5_ori.csv"))
 dt5 <- clean_outputDB(dt5_ori)
+fwrite(dt5, "data_backup/dt5_input_cleaned.csv")
 
 # country-specific plot ---- 
 all_countries <- get_cnames(dt5)

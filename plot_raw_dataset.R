@@ -19,10 +19,10 @@ source("R/00_Functions_convert_to_count.R")
 # # 
 # inputDB[, table(Metric)]
 # inputDB[, table(Measure)] # ASCFR  Cases Deaths  Tests
-# dt1 <- clean_inputDB(inputDB = inputDB)
-# fwrite(dt1, "data_backup/dt1_input_cleaned.csv")
+# dt5 <- clean_inputDB(inputDB = inputDB)
+# fwrite(dt5, "data_backup/dt5_input_cleaned.csv")
 
-dt1 <- fread("data_backup/dt1_input_cleaned.csv")
+dt1 <- fread("data_backup/dt5_input_cleaned.csv")
 all_countries <- get_cnames(dt1)
 
 # country-specific plot ---- 
